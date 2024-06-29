@@ -1,0 +1,15 @@
+services:
+  web:
+    build: .
+    environment:
+        - STREAMLIT_PORT=${STREAMLIT_PORT}
+        - STREAMLIT_HOST=${STREAMLIT_HOST}
+        - DEV_MODE=${DEV_MODE}
+    ports:
+      - ${STREAMLIT_PORT}:${STREAMLIT_PORT}
+  redis:
+    image: "redis:alpine"
+    environment:
+        - REDIS_HOST=${REDIS_HOST}
+        - REDIS_PORT=${REDIS_PORT}
+        - DEV_MODE=${DEV_MODE}
