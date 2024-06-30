@@ -1,5 +1,5 @@
 from src.spotify import Spotify
 
-def test_spotify_authorize():
+def test_spotify__get_redirect_url():
     spotify = Spotify()
-    spotify.authorize()
+    assert spotify.redirect_uri is not None
