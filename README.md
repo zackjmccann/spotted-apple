@@ -1,5 +1,5 @@
 # spotted-apple :apple::snake:
-A converter for transferring playlists from Spotify to Apple Music
+A Streamlit application to transfer playlists from Spotify to Apple Music.
 
 ## Getting Started
 1. Copy the `.env-template` file and configure the outlined environment variables.
