@@ -81,7 +81,7 @@ if st.session_state['app_access_request'] is not None:
         spotify.authorize()
         st.session_state['auto_redirected'] = True
     countdown.markdown('')
-    #TODO: Check authorization, get token, and query Spotify!
+    # TODO: Check authorization, get token, and query Spotify!
 
   elif st.session_state['app_access_request'] == 'invalid':
     st.error('Please enter a valid email.')

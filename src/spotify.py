@@ -6,7 +6,6 @@ import requests
 import webbrowser
 import urllib
 
-# https://accounts.spotify.com/authorize?client_id=af1c7d8b7499446d90322049d01da3ac&redirect_uri=http://localhost:8501/&response_type=code
 
 class Spotify:
     def __init__(self):
