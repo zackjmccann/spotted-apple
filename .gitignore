@@ -162,9 +162,9 @@ cython_debug/
 #.idea/
 
 # IDE
-.vs_code
+.vscode
 .DS_Store
 
 # Envs
-envs
 .env
+local_dev_commands.sh
