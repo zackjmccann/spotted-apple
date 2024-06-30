@@ -38,5 +38,4 @@ class Spotify:
         if not STREAMLIT_PORT or not STREAMLIT_HOST:
             raise NameError('Streamlit Host and/or Port are not defined in the environment, cannot redirect.')
         
-        return "http://0.0.0.0:8501/"
-        # return f'http://{STREAMLIT_HOST}:{STREAMLIT_PORT}/'
+        return f'http://{STREAMLIT_HOST}:{STREAMLIT_PORT}/'
