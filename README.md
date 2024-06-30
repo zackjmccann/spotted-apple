@@ -1,4 +1,4 @@
-# spotted-apple
+# spotted-apple :apple::snake:
 A converter for transferring playlists from Spotify to Apple Music
 
 ## Getting Started
