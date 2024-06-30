@@ -23,14 +23,11 @@ def check_if_user_has_app_access():
 def validate_email_input():
   regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
-  if st.session_state['user_email'] == '':
-    return False
-
   try:
-    if re.fullmatch(regex, st.session_state['user_email']):
-        return True
-    else:
+    if not re.fullmatch(regex, st.session_state['user_email']) or st.session_state['user_email'] == '':
         return False
+    else:
+        return True
 
   except TypeError:
         return False
