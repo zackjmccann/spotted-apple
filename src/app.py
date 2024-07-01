@@ -2,6 +2,7 @@ import re
 import time
 import streamlit as st
 from helpers import handle_app_request
+from text_blocks import TEXT_BLOCKS
 from spotify import Spotify
 
 st.set_page_config(
@@ -28,23 +29,10 @@ st.header('Welcome!')
 st.write('Spotted Apple helps transfers playlists from Spotify to Apple Music.')
 
 st.subheader('How it Works')
-how_it_works_text = """
-**Spotted Apple** downloads all playlists on your Spotify Account and dumps the contents into a 
-Google Sheet, with each sheet representing a playlist. You can select, review, edit, and delete the playlists you 
-would like transferred to Apple Music (**Note:** Spotify and Apple  Music tracks are not always aligned, 
-and sometimes need to be interpolated. Additions to playlists are best administered  via your Spotify 
-account.) Once each playlist is configured as desired, simply click "Transfer Playlists" and Spotted Apple 
-will load all playlists from the Google Sheet into your Apple Music account!
-
-"""
-st.markdown(how_it_works_text)
+st.markdown(TEXT_BLOCKS['how_it_works'])
 
 st.subheader('Getting Started')
-request_permission_text = """
-Before you can authorize Spotted Apple to access your Spotify account, you must be added as a 
-user of the application. In order to request access to Spotted Apple, please enter your email below:
-"""
-st.markdown(request_permission_text)
+st.markdown(TEXT_BLOCKS['request_permission'])
 
 request_form, spacer, spacer_2 = st.columns(3)
 
