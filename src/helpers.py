@@ -15,7 +15,6 @@ class AuthenticationError(Exception):
         self.__dict__.update(kwargs)
         super().__init__(message, *args, **kwargs)
 
-
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         # auth_code will set to either be the error or None
@@ -40,7 +39,6 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.flush()
             return
 
-
 class LocalHTTPServer(HTTPServer):
     timeout = 10
     allow_reuse_address = True
@@ -48,11 +46,9 @@ class LocalHTTPServer(HTTPServer):
     def handle_timeout(self):
         raise TimeoutError(f'Local Server did not receive a request after {self.timeout} seconds.')    
 
-
 def create_local_http_server(port, handler=RequestHandler):
     host = '127.0.0.1'
     return LocalHTTPServer((host, port), handler)
-
 
 def get_host_port(network_location):
     """ 
@@ -70,7 +66,6 @@ def get_host_port(network_location):
 
     return host, port
 
-
 def handle_app_request(): # TODO: Maybe change the name here?
     if validate_email_input():
         if check_if_user_has_app_access():
@@ -79,7 +74,6 @@ def handle_app_request(): # TODO: Maybe change the name here?
             st.session_state['app_access_request'] = 'pending'
     else:
         st.session_state['app_access_request'] = 'invalid'
-
 
 def check_if_user_has_app_access():
     #TODO: Add check >> store users with development access to redis and validate
