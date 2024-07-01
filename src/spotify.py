@@ -54,7 +54,7 @@ class Spotify:
         return f'http://{STREAMLIT_HOST}:{STREAMLIT_PORT}/'
 
 
-class SpotifyAuth:
+class OAuthBase:
     def __init__(self, requests_session):
         self.requests_session = self._get_requests_session(self, requests_session)
 
@@ -98,7 +98,7 @@ class SpotifyAuth:
         self.requests_session.close()
 
 
-class SpotifyOAuth(SpotifyAuth):
+class SpotifyOAuth(OAuthBase):
     """
     Authorization for Spotify's OAuth flow
 
