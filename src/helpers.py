@@ -4,17 +4,6 @@ import streamlit as st
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
-class AuthenticationError(Exception):
-    """
-    General purpose Error to raise during Auth Code for Spotify
-    and/or Apple Music.
-    """
-    def __init__(self, message, error=None, error_description=None, *args, **kwargs):
-        self.error = error
-        self.error_description = error_description
-        self.__dict__.update(kwargs)
-        super().__init__(message, *args, **kwargs)
-
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         # auth_code will set to either be the error or None
