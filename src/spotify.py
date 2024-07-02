@@ -7,8 +7,9 @@ import base64
 import requests
 import webbrowser
 import urllib
+import time
+from auth import OAuthBase, AuthenticationError
 from helpers import (
-    AuthenticationError,
     RequestHandler,
     LocalHTTPServer,
     create_local_http_server,
@@ -18,6 +19,8 @@ from helpers import (
     validate_email_input
     )
 from http.server import BaseHTTPRequestHandler, HTTPServer
+
+DEV_MODE = os.getenv('DEV_MODE')
 
 # TODO: Deprecate once SpotifyAuth and SpotifyOAuth classes are finished
 class Spotify:
@@ -61,42 +64,31 @@ class SpotifyOAuth(OAuthBase):
     For the purpose of this application/implemenation, the class
     assumes the appropriate environment variables are present.
     """
-
-    AUTHORIZE_URL = "https://accounts.spotify.com/authorize"
-    TOKEN_URL = ""
-
-    def __init__(self, requests_session=None, requests_timeout=None, open_browser=True):
-        # TODO: check if "requests_session=None" works
+    def __init__(self, requests_session=None, requests_timeout=None):
+        # TODO: check "requests_timeout" implementation
         """
         Creates a SpotifyOAuth object
 
-        Parameters:
-             * requests_session: A Requests session
-             * requests_timeout: Optional, tell Requests to stop waiting for a response after
+        Parameters
+             - requests_session: A Requests Session
+             - requests_timeout: Optional, tell Requests to stop waiting for a response after
                                  a given number of seconds
-             * open_browser: Optional, whether the web browser should be opened to
-                             authorize a user
         """
         super().__init__(requests_session)
-
-        self.authorization_url = (
-            "https://accounts.spotify.com/authorize"  # TODO: End with "?"
-        )
-        self.token_url = "https://accounts.spotify.com/api/token"  # TODO: End with "?"
+        self.authorization_url = 'https://accounts.spotify.com/authorize'
+        self.token_url = 'https://accounts.spotify.com/api/token'
         self.client_id = os.getenv("SPOTIFY_CLIENT_ID")
-        self.client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
+        self.client_secret = os.getenv('SPOTIFY_CLIENT_SECRET')
         self.redirect_uri = self._get_redirect_url(self)
-        self.state = os.getenv("SPOTIFY_STATE")
-        self.authorization_headers = self._make_authorization_headers(self)
-        self.scope = "user-read-private user-read-email"  # TODO: Hardcoded for simplicity, change if needed
+        self.state = os.getenv('SPOTIFY_STATE') if not DEV_MODE else os.getenv('SPOTIFY_DEV_STATE')
+        self.authorization_headers = self._make_authorization_headers()
+        self.scope = 'user-read-private user-read-email'  # TODO: Hardcoded for simplicity, change if needed
         self.cache_handler = None  # TODO: Caching with Redis?
         self.requests_timeout = requests_timeout
-        self.show_dialog = show_dialog
-        self.open_browser = open_browser
 
     def validate_token(self, token_info):
-        # If there is no token or if token scopes don't match, end request
-        if token_info is None or "scope" not in token_info:
+        # End the request if there is no token
+        if token_info is None:
             return None
 
         if self.is_token_expired(token_info):
@@ -115,7 +107,12 @@ class SpotifyOAuth(OAuthBase):
             }
         )
 
-        return f"{self.authorization_url}?{urlparams}"
+        return f"{self.authorization_url}?{payload}"
+
+    def get_authorization_code(self, response=None):
+        if response:
+            return self.parse_response_code(response) # TODO: parse_response_code expects a URL
+        return self._get_auth_response()
 
     def parse_response_code(self, url):
         _, code = self.parse_auth_response_url(url)
@@ -124,7 +121,15 @@ class SpotifyOAuth(OAuthBase):
         else:
             return code
 
-    def _get_auth_response(self, open_browser=False):
+    def _get_auth_response(self):
+        # TODO: Revisit how your planning on using this class
+        #       within a Streamlit App and your Spotted Apple App. If 
+        #       Spotted Apple's redirect URL is a running Streamlit App, there's
+        #       likely no need to start a local/seperate server to field the redirect
+        #       from Spotify's auth flow. Just read the URL on a given streamlit page load
+        #       a parse it for a "code" parameter (then try to exchange it for a token).
+        #       Depending on how that's implemented will determine how it's coupled to this class
+        #       and whether a local/seperate server is needed.
         redirect_info = urlparse(self.redirect_uri)
         redirect_host, redirect_port = get_host_port(redirect_info.netloc)
         redirected_url = 'redirected URL' #TODO: Add redirected URL here
@@ -146,11 +151,6 @@ class SpotifyOAuth(OAuthBase):
 
 
         return code
-
-    def get_authorization_code(self, response=None):
-        if response:
-            return self.parse_response_code(response)
-        return self._get_auth_response()
 
     def get_access_token(self, code=None, check_cache=True):
         """
@@ -184,7 +184,7 @@ class SpotifyOAuth(OAuthBase):
             )
             response.raise_for_status()
             token_info = response.json()
-            token_info = self._add_custom_values_to_token_info(token_info)
+            token_info = self._add_token_metadata(token_info)
             self.save_token_to_cache(token_info)
             return token_info["access_token"]
         except requests.exceptions.HTTPError as http_error:
@@ -206,7 +206,7 @@ class SpotifyOAuth(OAuthBase):
             )
             response.raise_for_status()
             token_info = response.json()
-            token_info = self._add_custom_values_to_token_info(token_info)
+            token_info = self._add_token_metadata(token_info)
             if "refresh_token" not in token_info:
                 token_info["refresh_token"] = refresh_token
             self.save_token_to_cache(token_info)
@@ -214,14 +214,11 @@ class SpotifyOAuth(OAuthBase):
         except requests.exceptions.HTTPError as http_error:
             self._handle_oauth_error(http_error)
 
-    def _add_custom_values_to_token_info(self, token_info):
-        """
-        Store some values that aren't directly provided by a Web API
-        response.
-        """
-        # TODO: Move this to Redis?
-        token_info["expires_at"] = int(time.time()) + token_info["expires_in"]
-        token_info["scope"] = self.scope
+    def _add_token_metadata(self, token_info):
+        """Add metadata for application"""
+        token_info.update({
+            "expiration_timestamp": int(time.time()) + token_info["expires_in"]
+            })
         return token_info
 
     def save_token_to_cache(self, token_info):
@@ -237,14 +234,15 @@ class SpotifyOAuth(OAuthBase):
     @staticmethod
     def parse_auth_response_url(url):
         query_string = urllib.parse.urlparse(url).query
-        app_form = dict(parse_qsl(query_string)) # Data of type application/x-www-form-urlencoded
+        response_parameters = dict(urllib.parse.parse_qsl(query_string))
 
-        if "error" in app_form:
+        if "error" in response_parameters:
             raise AuthenticationError(
-                message=f"Auth server error: {app_form['error']}", error=app_form["error"]
+                message=f"Auth server error: {response_parameters['error']}",
+                error=response_parameters["error"]
             )
-
-        return tuple(app_form.get(param) for param in ["state", "code"]) # TODO: Check this
+        else:
+            return response_parameters
 
     @staticmethod
     def _get_redirect_url(self):
