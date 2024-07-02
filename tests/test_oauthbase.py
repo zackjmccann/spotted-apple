@@ -30,22 +30,24 @@ def fake_expired_token():
         }
 
 @pytest.fixture
-def http_error():
-    # Create response
+def http_response():
     response = Response()
     response.code = 'Not Found'
     response.error_type = 'Not Found'
     response.status_code = 404
     response._content = b'{ "error": "URL Not Found", "error_description":  "bad url"}'
 
-    # Create HTTPError and add response
+    return response
+
+@pytest.fixture
+def http_error(http_response):
     url = 'bad url'
     code = 404
     msg = 'Not Found: bad url'
     headers = {'Content-Type': 'application/json; charset=utf-8'}
     f = io.BytesIO(b"\x00\x01")
     http_error = HTTPError(url, code, msg, headers, f)
-    http_error.response = response
+    http_error.response = http_response
 
     return http_error
 

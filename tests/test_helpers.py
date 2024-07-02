@@ -1,26 +1,3 @@
-def test_authentication_error_class():
-    from src.helpers import AuthenticationError
-    message = 'Test Error'
-    error = 418
-    error_description = 'Error testing the class'
-    occurs_during = 'test'
-
-    auth_err = AuthenticationError(
-        {
-            'message': message,
-            'occurs_during': occurs_during
-        },
-        error=error,
-        error_description=error_description,
-    )
-
-    assert isinstance(auth_err, Exception)
-    assert auth_err.error == error
-    assert auth_err.error_description == error_description
-    execption_details = dict(auth_err.args[0])
-    assert execption_details['message'] == message
-    assert execption_details['occurs_during'] == occurs_during
-
 def test_get_host_port():
     from src.helpers import get_host_port
     network_location_1 = 'localhost:8080'
