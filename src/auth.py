@@ -29,7 +29,7 @@ class OAuthBase:
     @staticmethod  # TODO: Review this method
     def is_token_expired(token_info):
         now = int(time.time())
-        return token_info["expires_at"] - now < 60
+        return token_info["expiration_timestamp"] - now < 60
 
     def _handle_oauth_error(self, http_error):
         """
