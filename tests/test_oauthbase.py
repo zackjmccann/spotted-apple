@@ -7,27 +7,10 @@ from src.auth import AuthenticationError
 from urllib.error import HTTPError
 from requests.models import Response
 
-@pytest.fixture
-def new_request_session():
-    return requests.Session()
 
 @pytest.fixture
 def oauth_base(new_request_session):
     return OAuthBase(new_request_session)
-
-@pytest.fixture
-def fake_valid_token():
-    expires_at = int(time.time())
-    return {
-        "expires_at": expires_at
-        }
-
-@pytest.fixture
-def fake_expired_token():
-    expires_at = int(time.time())
-    return {
-        "expires_at": expires_at + 80
-        }
 
 @pytest.fixture
 def http_response():
@@ -58,12 +41,14 @@ def test_create_requests_session():
     oauth_base = OAuthBase(None)
     assert isinstance(oauth_base.requests_session, requests.Session)
 
-def test_expired_token(oauth_base, fake_expired_token):
-    assert not oauth_base.is_token_expired(fake_expired_token)
+def test_expired_token(oauth_base, expired_token):
+    assert not oauth_base.is_token_expired(expired_token)
 
-def test_valid_token(oauth_base, fake_valid_token):
-    assert oauth_base.is_token_expired(fake_valid_token)
+def test_valid_token(oauth_base, valid_token):
+    assert oauth_base.is_token_expired(valid_token)
 
 def test_handle_oauth_error(oauth_base, http_error):
     with pytest.raises(AuthenticationError):
         oauth_base._handle_oauth_error(http_error)
+
+
