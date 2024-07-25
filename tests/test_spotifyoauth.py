@@ -44,4 +44,4 @@ def test_parse_access_denied_auth_response_url(spotify_oauth, access_denied_redi
 def test_parse_response_code(spotify_oauth, access_granted_redirect_uri):
     response_code = spotify_oauth.parse_auth_response_url(access_granted_redirect_uri)
     code = 'NApCCg..BkWtQ'
-    assert response_code == code
+    assert response_code['code'] == code
