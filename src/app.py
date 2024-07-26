@@ -4,7 +4,9 @@ import streamlit as st
 from helpers import handle_app_request
 from text_blocks import TEXT_BLOCKS
 from spotify import Spotify
+from logs.spotted_apple_logger import logger
 
+logger.debug(f'app running...')
 st.set_page_config(
   page_title="Spotted Apple",
   page_icon=":headphones:",
