@@ -167,4 +167,4 @@ cython_debug/
 
 # Envs
 .env
-local_dev_commands.sh
+.dev
