@@ -10,9 +10,9 @@ def get_log_level():
         return logging.INFO
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('spotted_apple_logger')
 
 logging.basicConfig(
     level=get_log_level(),
-    format='[%(asctime)s] %(levelname)s | %(message)s',
+    format='[%(asctime)s] %(levelname)s | %(message)s (%(funcName)s:%(lineno)d)',
     datefmt='%Y-%m-%d %H:%M:%S')

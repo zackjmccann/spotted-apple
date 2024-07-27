@@ -1,15 +1,16 @@
+name: ${STACK_NAME}
 services:
   web:
     build: .
-    environment:
-        - STREAMLIT_PORT=${STREAMLIT_PORT}
-        - STREAMLIT_HOST=${STREAMLIT_HOST}
-        - DEV_MODE=${DEV_MODE}
+    image: ${IMAGE}
+    container_name: ${CONTAINER}
+    env_file:
+      - "../.env"
+    restart: "${DOCKER_RESTART_POLICY:-no}"
+    deploy:
+      resources:
+        limits:
+          cpus: "${DOCKER_WEB_CPUS:-0}"
+          memory: "${DOCKER_WEB_MEMORY:-0}"
     ports:
-      - ${STREAMLIT_PORT}:${STREAMLIT_PORT}
-  redis:
-    image: "redis:alpine"
-    environment:
-        - REDIS_HOST=${REDIS_HOST}
-        - REDIS_PORT=${REDIS_PORT}
-        - DEV_MODE=${DEV_MODE}
+      - "${DOCKER_WEB_PORT_FORWARD:-0.0.0.0:8501}:${PORT:-8501}"
