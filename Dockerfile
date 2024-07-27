@@ -1,38 +1,34 @@
 FROM python:3.9-slim
 
-RUN groupadd --gid 1000 spotted-apple && \
-    useradd --uid 1000 --gid 1000 -ms /bin/bash spotted-app-dev
-    
-RUN apt-get update && apt-get install -y \
-    gcc \
-    git \
-    curl \
-    make \
-    musl-dev \
-    build-essential \
-    software-properties-common \
-    && rm -rf /var/lib/apt/lists/*
-    
-ADD --chmod=755 https://astral.sh/uv/install.sh /tmp/install.sh
-RUN /tmp/install.sh && rm /tmp/install.sh
+ARG UID=1000
+ARG GID=1000
+ENV HOME=/app
+ENV PORT=8501
 
-ENV HOME=/home/spotted-apple-dev
-ENV VIRTUAL_ENV=prod-venv
-ENV STREAMLIT_PORT=8501
-
-COPY src ${HOME}/src
-COPY run.sh ${HOME}/run.sh
-COPY requirements.txt ${HOME}/requirements.txt
-# RUN chmod +x ${HOME}/run.sh
-
-RUN python -m venv ${VIRTUAL_ENV}
-RUN . ${VIRTUAL_ENV}/bin/activate
-ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
-RUN /root/.cargo/bin/uv pip install --system --no-cache -r ${HOME}/requirements.txt
-
-USER spotted-app-dev
 WORKDIR ${HOME}
 
-EXPOSE ${STREAMLIT_PORT}
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential curl libpq-dev software-properties-common \
+    gcc curl make musl-dev \
+    && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man \
+    && apt-get clean \
+    && groupadd -g "${GID}" apple \
+    && useradd --create-home --no-log-init -u "${UID}" -g "${GID}" spotted \
+    && chown spotted:apple -R ${HOME}
+    
+USER spotted
 
-ENTRYPOINT ["./run.sh"]
+COPY --chown=spotted:apple requirements*.txt ./
+COPY --chown=spotted:apple bin/ ./bin
+COPY --chown=spotted:apple . .
+
+RUN chmod 0755 bin/* && bin/install
+
+ENV PYTHONUNBUFFERED="true" \
+    PYTHONPATH="." \
+    PATH=${HOME}/.local/bin:${PATH} \
+    USER="spotted"
+
+EXPOSE ${PORT}
+
+CMD [ "streamlit", "run", "src/app.py" ]
