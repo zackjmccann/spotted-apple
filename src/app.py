@@ -3,7 +3,7 @@ import time
 import streamlit as st
 from helpers import handle_app_request
 from text_blocks import TEXT_BLOCKS
-from spotify import Spotify
+from spotify import SpotifyOAuth
 from logs.spotted_apple_logger import logger
 
 logger.debug(f'app running...')
@@ -19,7 +19,7 @@ st.set_page_config(
     }
   )
 
-spotify = Spotify()
+spotify = SpotifyOAuth()
 if 'app_access_request' not in st.session_state:
   st.session_state['app_access_request'] = None
 
