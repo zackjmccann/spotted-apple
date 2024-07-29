@@ -64,7 +64,7 @@ class SpotifyOAuth(OAuthBase):
         if auto_open:
             webbrowser.open_new_tab(self.authorization_url + '?' + payload)
         else:
-            return self.authorization_url + payload
+            return self.authorization_url + '?'  + payload
 
     def validate_token(self, token_info):
         # End the request if there is no token
@@ -228,10 +228,14 @@ class SpotifyOAuth(OAuthBase):
     def _get_redirect_url(self):
         """The redirect URL should lead back to the appropriate Streamlit App page"""
         # TODO: Not inherently part of 'Spotify', think about how to abstract better
+        DEV_MODE = os.getenv('DEV_MODE')
         HOST = os.getenv('HOST')
         PORT = os.getenv('PORT')
 
         if not PORT or not HOST:
             raise NameError('Host and/or Port are not defined in the environment, cannot redirect.')
         
-        return f'http://{HOST}:{PORT}/' # TODO: Add https when SSL cert is provisioned
+        if not DEV_MODE:
+            return f'http://{HOST}/' # TODO: Add https when SSL cert is provisioned
+        else:
+            return f'http://{HOST}:{PORT}/'

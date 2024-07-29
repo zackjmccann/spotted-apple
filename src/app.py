@@ -58,7 +58,7 @@ if st.session_state['app_access_request'] is not None:
     st.success('Access Granted!')
     redirect_message, countdown, redirect_spacer = st.columns(spec=[3, .5, 4.5])
     with redirect_message:
-      st.markdown('You are being redirected to the [Spotify authorization page](%s)...' % spotify.authorize(auto_open=False))
+      st.markdown('Please visit to the [Spotify authorization page](%s)...' % spotify.authorize(auto_open=False))
     with countdown:
       countdown = st.empty()
 
