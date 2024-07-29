@@ -65,7 +65,7 @@ def handle_app_request(): # TODO: Maybe change the name here?
         st.session_state['app_access_request'] = 'invalid'
 
 def check_if_user_has_app_access():
-    #TODO: Add check >> store users with development access to redis and validate
+    #TODO: Add operational PostgreSQL DB for user data
     if st.session_state['user_email'] == os.getenv('SPOTIFY_ADMIN'):
         return True
     else:
