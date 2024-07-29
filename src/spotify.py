@@ -52,7 +52,6 @@ class SpotifyOAuth(OAuthBase):
         self.cache_handler = None  # TODO: Caching with Redis?
         self.requests_timeout = requests_timeout
 
-
     def authorize(self, auto_open=True):
         response_type = 'code'
         payload = urllib.parse.urlencode({
@@ -61,7 +60,7 @@ class SpotifyOAuth(OAuthBase):
             'response_type': 'code',
             'scope': 'user-read-private user-read-email'
             })
-        if auto_open:
+        if auto_open: # TODO: I don't think this worked when host on k8s?
             webbrowser.open_new_tab(self.authorization_url + '?' + payload)
         else:
             return self.authorization_url + '?'  + payload
@@ -74,6 +73,7 @@ class SpotifyOAuth(OAuthBase):
         if self.is_token_expired(token_info):
             return self.refresh_access_token(token_info["refresh_token"])
 
+    #TODO: Delete below method, redundant of authorize?
     def get_authorize_url(self, state=None):
         response_type = "code"
 

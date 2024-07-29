@@ -5,6 +5,8 @@ from helpers import handle_app_request
 from text_blocks import TEXT_BLOCKS
 from spotify import SpotifyOAuth
 from logs.spotted_apple_logger import logger
+from navigation import make_sidebar
+
 
 logger.debug(f'app running...')
 st.set_page_config(
@@ -19,7 +21,9 @@ st.set_page_config(
     }
   )
 
+make_sidebar()
 spotify = SpotifyOAuth()
+
 if 'app_access_request' not in st.session_state:
   st.session_state['app_access_request'] = None
 
@@ -72,6 +76,10 @@ if st.session_state['app_access_request'] is not None:
         st.session_state['auto_redirected'] = True
     countdown.markdown('')
     # TODO: Check authorization, get token, and query Spotify!
+    st.session_state.logged_in = True
+    st.success("Logged in successfully!")
+    time.sleep(0.5)
+    st.switch_page("pages/page1.py")
 
   elif st.session_state['app_access_request'] == 'invalid':
     st.error('Please enter a valid email.')
