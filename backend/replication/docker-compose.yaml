@@ -18,3 +18,4 @@ services:
 networks:
   db_network:
     name: db_network
+    external: true
