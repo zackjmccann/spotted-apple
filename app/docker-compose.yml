@@ -1,11 +1,13 @@
-name: ${STACK_NAME}
+name: spotted_apple
 services:
   web:
     build: .
-    image: ${IMAGE}
-    container_name: ${CONTAINER}
+    image: ${APP_IMAGE}
+    container_name: ${APP_CONTAINER}
+    networks:
+      db_network:
     env_file:
-      - "../.env"
+      - ".env"
     restart: "${DOCKER_RESTART_POLICY:-no}"
     deploy:
       resources:
@@ -14,3 +16,8 @@ services:
           memory: "${DOCKER_WEB_MEMORY:-0}"
     ports:
       - "${DOCKER_WEB_PORT_FORWARD:-0.0.0.0:8501}:${PORT:-8501}"
+
+networks:
+  db_network:
+    name: db_network
+    external: true
