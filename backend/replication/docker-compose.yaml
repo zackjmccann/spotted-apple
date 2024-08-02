@@ -1,10 +1,10 @@
-name: backend_${CONTAINER}
+name: backend_${REP_CONTAINER}
 services:
   basil:
     build: 
       dockerfile: ../Dockerfile
-    image: ${IMAGE}
-    container_name: ${CONTAINER}
+    image: ${REP_IMAGE}
+    container_name: ${REP_CONTAINER}
     networks:
       db_network:
     env_file:

@@ -1,14 +1,14 @@
-name: backend_${CONTAINER}
+name: backend_${PRIMARY_CONTAINER}
 services:
   aloe:
     build: 
       dockerfile: ../Dockerfile
-    image: ${IMAGE}
-    container_name: ${CONTAINER}
+    image: ${PRIMARY_IMAGE}
+    container_name: ${PRIMARY_CONTAINER}
     networks:
       db_network:
         aliases:
-          - db_aloe
+          - db_net
     env_file:
       - "../.env"
     restart: "${DOCKER_RESTART_POLICY:-no}"
