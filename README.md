@@ -1,4 +1,4 @@
-# spotted-apple :apple::snake:
+# Spotted Apple :apple::snake:
 Spotted Apple allows playlist generation and sharing between Spotify to Apple Music.
 
 ## Architecture
