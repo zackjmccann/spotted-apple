@@ -1,0 +1,16 @@
+name: ${STACK_NAME}
+services:
+  web:
+    build: .
+    image: ${IMAGE}
+    container_name: ${CONTAINER}
+    env_file:
+      - "../.env"
+    restart: "${DOCKER_RESTART_POLICY:-no}"
+    deploy:
+      resources:
+        limits:
+          cpus: "${DOCKER_WEB_CPUS:-0}"
+          memory: "${DOCKER_WEB_MEMORY:-0}"
+    ports:
+      - "${DOCKER_WEB_PORT_FORWARD:-0.0.0.0:8501}:${PORT:-8501}"
