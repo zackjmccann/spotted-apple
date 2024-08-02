@@ -1,0 +1,22 @@
+name: backend_${CONTAINER}
+services:
+  aloe:
+    build: 
+      dockerfile: ../Dockerfile
+    image: ${IMAGE}
+    container_name: ${CONTAINER}
+    networks:
+      db_network:
+        aliases:
+          - db_aloe
+    env_file:
+      - "../.env"
+    restart: "${DOCKER_RESTART_POLICY:-no}"
+    volumes:
+    - ./pgdata:/data
+    - ./config:/config
+    - ./archive:/mnt/server/archive
+
+networks:
+  db_network:
+    name: db_network
