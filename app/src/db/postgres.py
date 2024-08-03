@@ -10,14 +10,14 @@ class Postgres:
         self.port = os.getenv('POSTGRES_PORT')
         self.cursor = self._get_cursor()
 
-    def _get_engine(self):
+    def _get_connection(self):
         return psycopg.connect(conninfo=f'postgresql://'
                                         f'{self.user}:{self.password}@'
                                         f'{self.host}:{self.port}'
                                         f'/{self.database}')
 
     def _get_cursor(self):
-        return self._get_engine().cursor()  
+        return self._get_connection().cursor()  
 
     def execute(self, query: str) -> psycopg.Cursor:
         cur = self._get_cursor()
