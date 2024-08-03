@@ -12,6 +12,8 @@ services:
     env_file:
       - "../.env"
     restart: "${DOCKER_RESTART_POLICY:-no}"
+    ports:
+      - "0.0.0.0:5432:5432"
     volumes:
     - ./pgdata:/data
     - ./config:/config
