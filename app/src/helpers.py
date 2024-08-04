@@ -84,7 +84,6 @@ def validate_email_input():
     except TypeError:
             return False
 
-
 def signup_new_user():
     try:
         assert validate_email_input()
