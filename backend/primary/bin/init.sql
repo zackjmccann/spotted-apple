@@ -1,2 +1,6 @@
--- TODO: This needs to be considered
-SELECT 1;
+CREATE TABLE IF NOT EXISTS users (
+  user_id  BIGSERIAL PRIMARY KEY,
+  email    TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  created  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
