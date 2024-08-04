@@ -8,22 +8,10 @@ class Postgres:
         self.password = os.getenv('POSTGRES_PASSWORD')
         self.host = os.getenv('POSTGRES_HOST')
         self.port = os.getenv('POSTGRES_PORT')
-        self.cursor = self._get_cursor()
+        self.conn = self.get_connection()
 
-    def _get_connection(self):
+    def get_connection(self):
         return psycopg.connect(conninfo=f'postgresql://'
                                         f'{self.user}:{self.password}@'
                                         f'{self.host}:{self.port}'
                                         f'/{self.database}')
-
-    def _get_cursor(self):
-        return self._get_connection().cursor()  
-
-    def execute(self, query: str) -> psycopg.Cursor:
-        cur = self._get_cursor()
-        cur.execute(query)
-        
-        return cur.fetchall()
-
-    def close(self):
-        self.cursor.close()
