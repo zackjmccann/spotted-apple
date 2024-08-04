@@ -1,13 +1,15 @@
 import streamlit as st
-from helpers import login_user
+from auth.spotted_apple import login_user
 from logs.spotted_apple_logger import logger
+from navigation import make_sidebar
 
+make_sidebar()
 
 if 'login_attempted' not in st.session_state:
-  st.session_state['login_attempted'] = None
+  st.session_state['login_attempted'] = False
 
 if 'is_logged_in' not in st.session_state:
-  st.session_state['is_logged_in'] = None
+  st.session_state['is_logged_in'] = False
 
 st.subheader('Login to Spotted Apple :snake::apple:')
 
@@ -17,7 +19,7 @@ with login:
   login.text_input(
     label='Email',
     help='Please provide the email for your account.',
-    key='user_email',
+    key='login_email',
     placeholder='example@email.com'
   )
   
@@ -25,7 +27,7 @@ with login:
     label='Password',
     type='password',
     help='Please a password for your account.',
-    key='user_password',
+    key='login_password',
   )
   
   login.form_submit_button(
@@ -33,9 +35,14 @@ with login:
     on_click=login_user
   )
 
-if st.session_state['is_logged_in']:
-    st.switch_page("Profile.py")
-else:
-    if st.session_state['login_attempted']:
-        if not st.session_state['is_logged_in']:
-            st.error('Sorry, we could not log you in.')
+if st.session_state.get('login_attempted', False):
+  del st.session_state['login_attempted']
+
+  if st.session_state['is_logged_in']:
+    st.success('Logged in!')
+    st.switch_page('pages/3_Profile.py')
+
+  else:
+    if st.session_state['login_failed']:
+      del st.session_state['login_failed']
+      st.error('Incorrect username or password.')
