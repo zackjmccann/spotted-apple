@@ -8,7 +8,7 @@ import requests
 import webbrowser
 import urllib
 import time
-from auth import OAuthBase, AuthenticationError
+from auth.oauth import OAuthBase, AuthenticationError
 from helpers import (
     RequestHandler,
     LocalHTTPServer,
