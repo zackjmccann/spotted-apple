@@ -2,8 +2,8 @@ import io
 import time
 import pytest
 import requests
-from src.auth import OAuthBase
-from src.auth import AuthenticationError
+from src.auth.oauth import OAuthBase
+from src.auth.oauth import AuthenticationError
 from urllib.error import HTTPError
 from requests.models import Response
 

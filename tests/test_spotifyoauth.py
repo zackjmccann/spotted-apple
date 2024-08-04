@@ -2,7 +2,7 @@ import os
 import re
 import pytest
 import requests
-from src.auth import AuthenticationError
+from src.auth.oauth import AuthenticationError
 
 """
 # TODO: Build tests for methods below:
