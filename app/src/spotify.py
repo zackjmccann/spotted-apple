@@ -15,8 +15,7 @@ from helpers import (
     create_local_http_server,
     get_host_port,
     handle_app_request,
-    check_if_user_has_app_access,
-    validate_email_input
+    check_if_user_has_app_access
     )
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
