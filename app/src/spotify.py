@@ -8,53 +8,18 @@ import requests
 import webbrowser
 import urllib
 import time
-from auth import OAuthBase, AuthenticationError
+from auth.oauth import OAuthBase, AuthenticationError
 from helpers import (
     RequestHandler,
     LocalHTTPServer,
     create_local_http_server,
     get_host_port,
     handle_app_request,
-    check_if_user_has_app_access,
-    validate_email_input
+    check_if_user_has_app_access
     )
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 DEV_MODE = os.getenv('DEV_MODE')
-
-# TODO: Deprecate once SpotifyAuth and SpotifyOAuth classes are finished
-class Spotify:
-    def __init__(self):
-        self.base_url = 'https://accounts.spotify.com/authorize?'
-        self.client_id = os.getenv('SPOTIFY_CLIENT_ID')
-        self.client_secret = os.getenv('SPOTIFY_CLIENT_SECRET')
-        self.redirect_uri = self._get_redirect_url(self)
-        self.state = os.getenv('SPOTIFY_STATE')
-
-    def authorize(self, auto_open=True):
-        response_type = 'code'
-        payload = urllib.parse.urlencode({
-            'client_id': self.client_id,
-            'redirect_uri': self.redirect_uri,
-            'response_type': 'code',
-            'scope': 'user-read-private user-read-email'
-            })
-        if auto_open:
-            webbrowser.open_new_tab(self.base_url + payload)
-        else:
-            return self.base_url + payload
-
-    @staticmethod
-    def _get_redirect_url(self):
-        """The redirect URL should lead back to the appropriate Streamlit App page"""
-        # TODO: Not inherently part of Spotify, think about how to abstract better
-        STREAMLIT_PORT = os.getenv('STREAMLIT_PORT')
-        STREAMLIT_HOST = os.getenv('STREAMLIT_HOST')
-
-        if not STREAMLIT_PORT or not STREAMLIT_HOST:
-            raise NameError('Streamlit Host and/or Port are not defined in the environment, cannot redirect.')
-        
-        return f'http://{STREAMLIT_HOST}:{STREAMLIT_PORT}/'
 
 
 class SpotifyOAuth(OAuthBase):
@@ -86,6 +51,19 @@ class SpotifyOAuth(OAuthBase):
         self.cache_handler = None  # TODO: Caching with Redis?
         self.requests_timeout = requests_timeout
 
+    def authorize(self, auto_open=True):
+        response_type = 'code'
+        payload = urllib.parse.urlencode({
+            'client_id': self.client_id,
+            'redirect_uri': self.redirect_uri,
+            'response_type': 'code',
+            'scope': 'user-read-private user-read-email'
+            })
+        if auto_open: # TODO: I don't think this worked when host on k8s?
+            webbrowser.open_new_tab(self.authorization_url + '?' + payload)
+        else:
+            return self.authorization_url + '?'  + payload
+
     def validate_token(self, token_info):
         # End the request if there is no token
         if token_info is None:
@@ -94,6 +72,7 @@ class SpotifyOAuth(OAuthBase):
         if self.is_token_expired(token_info):
             return self.refresh_access_token(token_info["refresh_token"])
 
+    #TODO: Delete below method, redundant of authorize?
     def get_authorize_url(self, state=None):
         response_type = "code"
 
@@ -132,7 +111,7 @@ class SpotifyOAuth(OAuthBase):
         #       and whether a local/seperate server is needed.
         redirect_info = urlparse(self.redirect_uri)
         redirect_host, redirect_port = get_host_port(redirect_info.netloc)
-        redirected_url = 'redirected URL' #TODO: Add redirected URL here
+        redirected_url = self._get_redirect_url()
         server = start_local_http_server(redirect_port)
         server.handle_request()
         state, code = SpotifyOAuth.parse_auth_response_url(redirected_url)
@@ -247,13 +226,15 @@ class SpotifyOAuth(OAuthBase):
     @staticmethod
     def _get_redirect_url(self):
         """The redirect URL should lead back to the appropriate Streamlit App page"""
-        # TODO: Not inherently part of Spotify, think about how to abstract better
-        STREAMLIT_PORT = os.getenv("STREAMLIT_PORT")
-        STREAMLIT_HOST = os.getenv("STREAMLIT_HOST")
+        # TODO: Not inherently part of 'Spotify', think about how to abstract better
+        DEV_MODE = os.getenv('DEV_MODE')
+        HOST = os.getenv('HOST')
+        PORT = os.getenv('PORT')
 
-        if not STREAMLIT_PORT or not STREAMLIT_HOST:
-            raise NameError(
-                "Streamlit Host and/or Port are not defined in the environment, cannot redirect."
-            )
-
-        return f"http://{STREAMLIT_HOST}:{STREAMLIT_PORT}/"
+        if not PORT or not HOST:
+            raise NameError('Host and/or Port are not defined in the environment, cannot redirect.')
+        
+        if not DEV_MODE:
+            return f'http://{HOST}/' # TODO: Add https when SSL cert is provisioned
+        else:
+            return f'http://{HOST}:{PORT}/'

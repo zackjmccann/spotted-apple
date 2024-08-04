@@ -3,6 +3,8 @@ import time
 import requests
 import pytest
 from src.spotify import SpotifyOAuth
+from src.db.postgres import Postgres
+from src.db.spotted_apple_db import SpottedAppleDB
 
 
 @pytest.fixture
@@ -41,3 +43,11 @@ def access_denied_redirect_uri():
     base_url = 'https://my-domain.com/callback?error=access_denied'
     state = os.getenv('SPOTIFY_DEV_STATE')
     return f'{base_url}&state={state}'
+
+@pytest.fixture
+def postgres():
+    return Postgres()
+
+@pytest.fixture
+def spotted_apple_db():
+    return SpottedAppleDB()

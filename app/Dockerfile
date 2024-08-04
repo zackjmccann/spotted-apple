@@ -9,7 +9,7 @@ WORKDIR ${HOME}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential curl libpq-dev software-properties-common \
-    gcc curl make musl-dev \
+    gcc make musl-dev \
     && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man \
     && apt-get clean \
     && groupadd -g "${GID}" apple \
