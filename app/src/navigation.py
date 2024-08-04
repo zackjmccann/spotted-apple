@@ -13,20 +13,29 @@ def get_current_page_name():
 
 def make_sidebar():
     with st.sidebar:
-        st.write("")
-        st.write("")
+        st.title('Spotted Apple :apple::snake:')
+        st.write('')
+        st.write('')
 
-        if st.session_state.get("logged_in", False):
-            st.page_link("pages/signup.py", label="Sign Up")
-            st.page_link("pages/login.py", label="Login")
+        if st.session_state.get("is_logged_in", False):
+            st.page_link("Spotted_Apple.py", label="Home")
+            st.page_link("pages/3_Profile.py", label="Profile")
             st.write("")
             st.write("")
             if st.button("Log out"):
                 logout()
-        elif get_current_page_name() != "Spotted_Apple":
-            st.switch_page("Spotted_Apple.py")
+
+        else:
+            st.page_link("Spotted_Apple.py", label="Home")
+            st.page_link("pages/1_Signup.py", label="Sign Up")
+            st.page_link("pages/2_Login.py", label="Login")
+            st.write("")
+            st.write("")
 
 def logout():
-    st.session_state.logged_in = False
+    st.session_state['is_logged_in'] = False
+    del st.session_state['user_id']
+    del st.session_state['user_email']
+
     logger.info("Logged out successfully!")
     st.switch_page("Spotted_Apple.py")
