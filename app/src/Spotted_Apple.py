@@ -5,6 +5,7 @@ from helpers import handle_app_request
 from text_blocks import TEXT_BLOCKS
 from spotify import SpotifyOAuth
 from logs.spotted_apple_logger import logger
+from navigation import make_sidebar
 
 logger.debug(f'app running...')
 st.set_page_config(
@@ -19,13 +20,11 @@ st.set_page_config(
     }
   )
 
+make_sidebar()
 spotify = SpotifyOAuth()
 
-if 'app_access_request' not in st.session_state:
-  st.session_state['app_access_request'] = None
-
-if 'auto_redirected' not in st.session_state:
-  st.session_state['auto_redirected'] = False
+if 'is_logged_in' not in st.session_state:
+  st.session_state['is_logged_in'] = False
 
 st.title('Spotted Apple :apple::snake:')
 st.header('Welcome!')
