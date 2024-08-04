@@ -1,8 +1,7 @@
 import os
-import re
 import streamlit as st
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from logs.spotted_apple_logger import logger
+
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -70,29 +69,3 @@ def check_if_user_has_app_access():
         return True
     else:
         return False
-
-def validate_email_input():
-    logger.debug(f'validating email: {st.session_state["user_email"]}')
-    regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
-
-    try:
-        if not re.fullmatch(regex, st.session_state['user_email']) or st.session_state['user_email'] == '':
-            return False
-        else:
-            return True
-
-    except TypeError:
-            return False
-
-def signup_new_user():
-    try:
-        assert validate_email_input()
-        # TODO: Check for email in DB
-        logger.info('checking for existing account.')
-        logger.info('creating new user..')
-    except AssertionError:
-        st.session_state['valid_email_format'] = False
-
-def login_user():
-    # TODO: Check for email in DB
-    logger.info('logging in user..')
