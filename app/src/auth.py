@@ -56,4 +56,3 @@ class OAuthBase:
         """Close connection pool"""
         # TODO: Consider if this should check anything or try/except
         self.requests_session.close()
-
