@@ -12,6 +12,9 @@ def get_current_page_name():
     return pages[ctx.page_script_hash]["page_name"]
 
 def make_sidebar():
+    if 'is_logged_in' not in st.session_state:
+        st.session_state['is_logged_in'] = False
+
     with st.sidebar:
         st.title('Spotted Apple :apple::snake:')
         st.write('')
