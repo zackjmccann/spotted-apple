@@ -23,10 +23,10 @@ def make_sidebar():
             st.write("")
             if st.button("Log out"):
                 logout()
-        elif get_current_page_name() != "app":
-            st.switch_page("app.py")
+        elif get_current_page_name() != "Spotted_Apple":
+            st.switch_page("Spotted_Apple.py")
 
 def logout():
     st.session_state.logged_in = False
     logger.info("Logged out successfully!")
-    st.switch_page("app.py")
+    st.switch_page("Spotted_Apple.py")
