@@ -40,38 +40,58 @@ class SpottedAppleDB(Postgres):
             self.conn.commit()
             return user
 
-    def insert_spotify_authorization_data(self, user_id: int, auth_code: str, refresh_token: str):
-        # TODO: Should this overwrite existing data?
-        spotify_auth_statement = """
-        INSERT INTO spotify_authorizations (user_id, authorization_code, refresh_token)
-        VALUES (%s, %s, %s)
-        RETURNING spotify_authorizations.refresh_token;
+    def upsert_access_token_data(self, user_id, account, access_token_info):
+        upsert_access_token_data_statement = """
+        INSERT INTO access_tokens (
+                                    access_token_id,
+                                    account,
+                                    user_id,
+                                    access_token,
+                                    token_type,
+                                    scope,
+                                    expiration_time,
+                                    refresh_token
+                                  )
+        VALUES (%s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP + %s * interval '1 second', %s)
+        ON CONFLICT (access_token_id)
+        DO UPDATE
+            SET access_token = EXCLUDED.access_token,
+                token_type = EXCLUDED.token_type,
+                scope = EXCLUDED.scope,
+                expiration_time = EXCLUDED.expiration_time,
+                refresh_token = EXCLUDED.refresh_token,
+                modified = CURRENT_TIMESTAMP
+        RETURNING access_tokens.access_token;
         """
-
         with self.conn.cursor() as cursor:
             try:
-                cursor.execute(spotify_auth_statement, (user_id, auth_code, refresh_token))
-                entered_refresh_token = cursor.fetchall()[0][0]
+                access_token_id = account + '_' + str(user_id)
+                access_token = access_token_info.get('access_token')
+                token_type = access_token_info.get('token_type')
+                scope = access_token_info.get('scope')
+                expires_in = access_token_info.get('expires_in')
+                refresh_token = access_token_info.get('refresh_token')
+
+                cursor.execute(
+                    upsert_access_token_data_statement,
+                    (access_token_id, account, user_id, access_token, token_type, scope, expires_in, refresh_token)
+                    )
+                access_token = cursor.fetchall()[0][0]
                 self.conn.commit()
-                return entered_refresh_token
+                return access_token
             except psycopg.errors.UniqueViolation as err:
                 return err
 
-    def check_for_spotify_access_token(user_id: int):
-        spotify_auth_statement = """
-        SELECT sa.refresh_token, MAX(sa.created)
-        FROM spotify_authorizations sa
-        WHERE sa.user_id = %s
-        GROUP BY sa.refresh_token;
-        """
+    def get_access_token(self, access_token_id: str) -> str:
+        access_token_statement = 'SELECT access_token FROM access_tokens WHERE access_token_id = %s;'
         with self.conn.cursor() as cursor:
-            cursor.execute(spotify_auth_statement, (user_id,))
             try:
-                refresh_toke = cursor.fetchall()[0][0]
+                cursor.execute(access_token_statement, (access_token_id,))
+                access_token = cursor.fetchall()[0][0]
                 self.conn.commit()
-                return user
+                return access_token
             except IndexError:
-                return None
+                return None     
 
     @staticmethod
     def hash_password(entered_password: str):
