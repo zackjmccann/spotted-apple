@@ -32,7 +32,7 @@ class SpotifyOAuth(OAuthBase):
         self.client_id = os.getenv("SPOTIFY_CLIENT_ID")
         self.client_secret = os.getenv('SPOTIFY_CLIENT_SECRET')
         self.redirect_uri = self._get_redirect_url(self)
-        self.state = state = os.getenv('SPOTIFY_STATE') if not DEV_MODE else os.getenv('SPOTIFY_DEV_STATE')
+        self.state = state
         self.authorization_headers = self._make_authorization_headers()
         self.scope = 'user-read-private user-read-email'  # TODO: Hardcoded for simplicity, change if needed
         self.requests_timeout = requests_timeout # TODO: check "requests_timeout" implementation
