@@ -40,7 +40,7 @@ class SpottedAppleDB(Postgres):
             self.conn.commit()
             return user
 
-    def add_spotify_authorization_data(self, user_id: int, auth_code: str, refresh_token: str):
+    def insert_spotify_authorization_data(self, user_id: int, auth_code: str, refresh_token: str):
         # TODO: Should this overwrite existing data?
         spotify_auth_statement = """
         INSERT INTO spotify_authorizations (user_id, authorization_code, refresh_token)
@@ -56,6 +56,22 @@ class SpottedAppleDB(Postgres):
                 return entered_refresh_token
             except psycopg.errors.UniqueViolation as err:
                 return err
+
+    def check_for_spotify_access_token(user_id: int):
+        spotify_auth_statement = """
+        SELECT sa.refresh_token, MAX(sa.created)
+        FROM spotify_authorizations sa
+        WHERE sa.user_id = %s
+        GROUP BY sa.refresh_token;
+        """
+        with self.conn.cursor() as cursor:
+            cursor.execute(spotify_auth_statement, (user_id,))
+            try:
+                refresh_toke = cursor.fetchall()[0][0]
+                self.conn.commit()
+                return user
+            except IndexError:
+                return None
 
     @staticmethod
     def hash_password(entered_password: str):

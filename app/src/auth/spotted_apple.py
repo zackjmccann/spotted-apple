@@ -96,14 +96,24 @@ def clear_login_and_signup_data():
         except KeyError:
             logger.debug(f'Sign up or Login key not found: {signup_and_login_key}')
 
-def add_spotify_authorization_data():
+def handle_spotify_authorization():
     """Associate a Spotify Authorization Code and Refresh Token with a user"""
     spotted_apple_db = SpottedAppleDB()
     try:
-        refresh_token = spotted_apple_db.add_spotify_authorization_data(
+        refresh_token = spotted_apple_db.insert_spotify_authorization_data(
             user_id=st.session_state['user_id'],
             auth_code=st.session_state['spotify_auth_code'],
             refresh_token=st.session_state['spotify_refresh_token'])
         return refresh_token
     except psycopg.errors.ForeignKeyViolation as err:
             return err
+
+def get_access_token():
+    """
+    access_token
+    token_type
+    scope
+    expires_in
+    refresh_token
+    """
+    pass
