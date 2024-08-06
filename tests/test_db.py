@@ -43,12 +43,28 @@ def test_spotted_apple_db_verify_password(spotted_apple_db):
     hashed_password = spotted_apple_db.hash_password(password)
     assert spotted_apple_db.verify_password(password, hashed_password)
 
-def test_insert_spotify_authorization_data(spotted_apple_db):
+def test_upsert_access_token_data(spotted_apple_db):
     user_id = os.getenv('TEST_USER_ID')
-    auth_code = 'test_auth_code'
-    refresh_token = 'test_refresh_token'
-    returned_refresh_token = spotted_apple_db.insert_spotify_authorization_data(
+    account = 'spotify'
+    access_token_info = {
+        'access_token': 'somerandonaccesstoken',
+        'token_type': 'Bearer',
+        'scope': 'user-read-private user-read-email',
+        'expires_in': 3600,
+        'refresh_token': 'anotherrandomvalue'
+    }
+
+    access_token = spotted_apple_db.upsert_access_token_data(
         user_id=user_id,
-        auth_code=auth_code,
-        refresh_token=refresh_token)
-    assert returned_refresh_token == refresh_token
+        account=account,
+        access_token_info=access_token_info
+    )
+
+    assert access_token == access_token_info['access_token']
+
+def test_get_access_token(spotted_apple_db):
+    user_id = os.getenv('TEST_USER_ID')
+    account = 'spotify'
+    access_token_id = account + '_' + str(user_id)
+    access_token = spotted_apple_db.get_access_token(access_token_id)
+    assert access_token == 'somerandonaccesstoken'
