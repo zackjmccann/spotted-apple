@@ -95,3 +95,17 @@ def clear_login_and_signup_data():
             del st.session_state[signup_and_login_key]
         except KeyError:
             logger.debug(f'Sign up or Login key not found: {signup_and_login_key}')
+
+def save_access_token(account, access_token_info: dict) -> str:
+    spotted_apple_db = SpottedAppleDB()
+    access_token = spotted_apple_db.upsert_access_token_data(
+        user_id=st.session_state['user_id'],
+        account=account,
+        access_token_info=access_token_info
+    )
+    return access_token
+
+def get_access_token(account, user_id) -> str:
+    spotted_apple_db = SpottedAppleDB()
+    access_token_id = account + '_' + str(user_id)
+    return spotted_apple_db.get_access_token(access_token_id)

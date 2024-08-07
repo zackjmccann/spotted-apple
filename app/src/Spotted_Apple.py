@@ -1,9 +1,7 @@
 import re
 import time
 import streamlit as st
-from helpers import handle_app_request
 from text_blocks import TEXT_BLOCKS
-from spotify import SpotifyOAuth
 from logs.spotted_apple_logger import logger
 from navigation import make_sidebar
 
@@ -21,7 +19,6 @@ st.set_page_config(
   )
 
 make_sidebar()
-spotify = SpotifyOAuth()
 
 if 'is_logged_in' not in st.session_state:
   st.session_state['is_logged_in'] = False

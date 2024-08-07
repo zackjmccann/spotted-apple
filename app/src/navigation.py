@@ -23,6 +23,7 @@ def make_sidebar():
         if st.session_state.get("is_logged_in", False):
             st.page_link("Spotted_Apple.py", label="Home")
             st.page_link("pages/3_Profile.py", label="Profile")
+            st.page_link("pages/4_Settings.py", label="Settings")
             st.write("")
             st.write("")
             if st.button("Log out"):
