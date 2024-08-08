@@ -17,15 +17,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     
 USER spotted
 
-COPY --chown=spotted:apple package.json ./
-COPY --chown=spotted:apple package-lock.json ./
 COPY --chown=spotted:apple bin/ ./bin
-COPY --chown=spotted:apple . .
+COPY --chown=spotted:apple src/package.json ./
+COPY --chown=spotted:apple src/package-lock.json ./
+COPY --chown=spotted:apple src/. .
 
 RUN chmod 0755 bin/* && bin/install
-
-ENV PATH=${HOME}/.local/bin:${PATH} \
-    USER="spotted"
 
 EXPOSE ${PORT}
 
