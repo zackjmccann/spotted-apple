@@ -5,7 +5,7 @@ services:
     image: ${APP_IMAGE}
     container_name: ${APP_CONTAINER}
     networks:
-      db_network:
+      sa_network:
     env_file:
       - ".env"
     restart: "${DOCKER_RESTART_POLICY:-no}"
@@ -15,9 +15,8 @@ services:
           cpus: "${DOCKER_WEB_CPUS:-0}"
           memory: "${DOCKER_WEB_MEMORY:-0}"
     ports:
-      - "${DOCKER_WEB_PORT_FORWARD:-0.0.0.0:8501}:${PORT:-8501}"
+      - "3000:3000"
 
 networks:
-  db_network:
-    name: db_network
-    external: true
+  sa_network:
+    name: sa_network

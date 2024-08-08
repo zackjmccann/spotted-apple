@@ -1,9 +1,0 @@
-pandas==2.2.2
-psycopg==3.2.1
-pyarrow==16.1.0
-pytest==8.2.2
-python-dotenv==1.0.1
-redis==5.0.7
-requests==2.32.3
-streamlit==1.36.0
-watchdog==4.0.1
