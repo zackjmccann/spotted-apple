@@ -167,6 +167,8 @@ cython_debug/
 
 # Envs
 .env
+.env.development
+.env.local
 
 # Development Scripts
 .dev*
