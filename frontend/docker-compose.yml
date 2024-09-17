@@ -1,0 +1,22 @@
+name: spotted_apple
+services:
+  web:
+    build: .
+    image: ${APP_IMAGE}
+    container_name: ${APP_CONTAINER}
+    networks:
+      sa_network:
+    env_file:
+      - ".env"
+    restart: "${DOCKER_RESTART_POLICY:-no}"
+    deploy:
+      resources:
+        limits:
+          cpus: "${DOCKER_WEB_CPUS:-0}"
+          memory: "${DOCKER_WEB_MEMORY:-0}"
+    ports:
+      - "3000:3000"
+
+networks:
+  sa_network:
+    name: sa_network
