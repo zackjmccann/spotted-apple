@@ -12,7 +12,7 @@ const links = [
       {
         key: 'login',
         name: 'Login',
-        href: '/',
+        href: '/login',
         description: 'Already a user? Log in to access your account.'
       },
       { 
