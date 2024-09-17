@@ -28,6 +28,17 @@ export type LoginState = {
     message?: string | null;
 };
 
+export type CreateState = {
+    errors?: {
+        firstName?: string[];
+        lastName?: string[];
+        email?: string[];
+        password?: string[];
+        confirmPassword?: string[];
+    };
+    message?: string | null;
+};
+
 export async function loginUser(prevState: LoginState, formData: FormData) {
     // Validate form fields using Zod
     const validatedFields = LoginFormSchema.safeParse({
@@ -60,5 +71,44 @@ export async function loginUser(prevState: LoginState, formData: FormData) {
 
     // Redirect the user.
     redirect('/profile'); // TODO: Decide on a relative landing page
+
+};
+
+
+export async function createUser(prevState: CreateState, formData: FormData) {
+    // Validate form fields using Zod
+    const validatedFields = CreateFormSchema.safeParse({
+        firstName: formData.get('firstName'),
+        lastName: formData.get('lastName'),
+        email: formData.get('email'),
+        password: formData.get('password'),
+        confirmPassword: formData.get('confirmPassword'),
+    });
+
+    // If form validation fails, return errors early. Otherwise, continue.
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Log in failed.',
+        };
+    };
+
+    // Prepare data for validation against database
+    const { firstName, lastName, email, password } = validatedFields.data;
+
+    // Create Account logic 
+    try {
+        const created = false;
+
+    } catch (error) {
+        // If a database error occurs, return a more specific error.
+        return {
+        message: 'Database Error: Failed to log in.',
+        };
+
+    };
+
+    // Redirect the user.
+    redirect('/login'); // TODO: Decide on a relative landing page
 
 };

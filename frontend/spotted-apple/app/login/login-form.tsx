@@ -3,30 +3,26 @@
 import { loginUser, LoginState } from '@/app/lib/actions';
 import { useActionState } from 'react';
 import { useFormStatus, useFormState } from 'react-dom'
+import styles from '@/app/ui/styles.module.css'
 
 export default function LoginForm() {
     const initialState: LoginState = { message: null, errors: {} };
     const [state, formAction] = useFormState(loginUser, initialState);
   
     return (
-        <form action={formAction}>
-            <label htmlFor='email' className='mb-2 block text-sm font-medium'>
-                Email
-            </label>
-            <input
-                name='email'
-                type='string'
-                placeholder='example@email.com'
-            />
-            <label htmlFor='password' className='mb-2 block text-sm font-medium'>
-                Password
-            </label>
-            <input
-                name='password'
-                type='string'
-            />
-            <SubmitButton />
-        </form>
+            <form className={styles.form} action={formAction}>
+                <input
+                    name='email'
+                    type='string'
+                    placeholder='Email, username, phone number'
+                />
+                <input
+                    name='password'
+                    type='string'
+                    placeholder='Password'
+                />
+                <SubmitButton />
+            </form>
     )
 };
 
@@ -34,8 +30,8 @@ function SubmitButton() {
     const { pending } = useFormStatus()
   
     return (
-      <button type="submit" disabled={pending}>
-        {pending ? 'logging in...' : 'Login'}
+      <button className='w-full h-10 font-semibold rounded-lg bg-[#0141ff]' type="submit" disabled={pending}>
+        {pending ? 'logging in...' : 'Log In'}
       </button>
     )
 };
