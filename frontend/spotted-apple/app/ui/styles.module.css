@@ -10,4 +10,15 @@
     background-color: whitesmoke;
     box-shadow: 2px 2px 2px 1px rgb(2, 36, 137);
   }
-  
+
+.passwordConfirmationNote {
+  color: rgb(252, 69, 69);
+  font-size: small;
+}
+
+.showPassWordToggle {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  color: #00000082;
+}

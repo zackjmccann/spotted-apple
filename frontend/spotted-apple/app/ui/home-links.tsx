@@ -6,7 +6,7 @@ const links = [
     { 
         key: 'create-account',
         name: 'Create Account',
-        href: '/signup',
+        href: '/createaccount',
         description: 'Get started with Spotted Apple and share music faster.'
       },
       {
