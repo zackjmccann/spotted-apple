@@ -28,7 +28,6 @@ export type CreateAccountState = {
 };
 
 export async function createAccount(prevState: CreateAccountState, formData: FormData) {
-    // Validate form fields
     const validatedFields = CreateAccountFormSchema.safeParse({
         firstName: formData.get('firstName'),
         lastName: formData.get('lastName'),
@@ -44,10 +43,8 @@ export async function createAccount(prevState: CreateAccountState, formData: For
         };
     };
 
-    // Clean fields
     const { firstName, lastName, email, password } = validatedFields.data;
 
-    // Create Account
     try {
         console.log(`firstName: ${firstName}`)
         console.log(`lastName: ${lastName}`)
