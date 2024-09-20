@@ -1,12 +1,16 @@
 'use client';
 
 import { useRef, useState, useEffect } from "react";
+import { useFormState } from 'react-dom'
+
 import {Icon} from 'react-icons-kit';
 import {eye} from 'react-icons-kit/feather/eye';
 import {eyeOff} from 'react-icons-kit/feather/eyeOff';
-import { useFormState } from 'react-dom'
+
 import { createAccount, CreateAccountState } from '@/app/lib/create-account-actions';
-import styles from '@/app/ui/styles.module.css'
+
+import Link from 'next/link';
+import styles from '@/app/ui/styles.module.css';
 
 export default function CreateForm() {
     const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!~@#$%]).{8,24}$/;;
@@ -155,7 +159,7 @@ export default function CreateForm() {
                 <div aria-live="polite" aria-atomic="true">
                     {state.errors?.email ? (<p className="mt-2 text-sm text-red-500">{state.errors.email}</p>) : null}
                 </div>
-                <p className='text-sky-700 text-xs'>Already have an account? Sign in</p>
+                <Link className='text-sky-700 text-xs' href={'/login'}>Already have an account? Sign in</Link>
             </form>
     )
 };
