@@ -9,7 +9,7 @@ let testLastName = 'unit_test_last'
 let testPassword = 'unit_test_password'
 
 beforeAll(() => {
-    db.connect()
+    db.connect();
 })
 
 afterAll(() => {
