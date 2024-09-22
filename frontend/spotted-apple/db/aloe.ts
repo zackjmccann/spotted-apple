@@ -1,6 +1,6 @@
 import { Postgres } from "./postgres";
 import User from "./interfaces/user" // TODO: Target this import statement: import { User } from "@/app/lib/definitions"
-import NewUser from "./interfaces/new-user"
+import UserAuthentication from "./interfaces/user-authentication"
 
 export class Aloe extends Postgres {
     constructor() {
@@ -10,7 +10,7 @@ export class Aloe extends Postgres {
     async getUser(column:string='user_id', userData:number | string): Promise<User> {
         const getUserQuery = {
             name: `get-user-${userData}`,
-            text: `SELECT user_id, email, created
+            text: `SELECT user_id, email, first_name, last_name, created, modified
                    FROM users
                    WHERE ${column} = $1;`,
             values: [userData]
@@ -19,14 +19,17 @@ export class Aloe extends Postgres {
         return <User> {
             userId: Number(resultset.rows[0].user_id),
             email: resultset.rows[0].email,
+            firstName: resultset.rows[0].first_name,
+            lastName: resultset.rows[0].last_name,
             created: new Date(resultset.rows[0].created),
+            modified: new Date(resultset.rows[0].modified),
         }
     };
 
     async deleteUser(userId:number): Promise<Number | unknown> {
         try {
             const deleteUserQuery = {
-                name: 'delete-new-user',
+                name: 'delete-user',
                 text: `DELETE FROM users
                        WHERE user_id = $1
                        RETURNING users.user_id;`,
@@ -46,17 +49,17 @@ export class Aloe extends Postgres {
         };
     };
 
-    async insertUser(newUser:NewUser): Promise<Number | unknown> {
+    async insertUser(user:User): Promise<Number | unknown> {
         try {
-            const insertNewUserQuery = {
-                name: 'insert-new-user',
-                text: `INSERT INTO users (email, password)
-                       VALUES ($1, $2)
+            const insertUserQuery = {
+                name: 'insert-user',
+                text: `INSERT INTO users (email, first_name, last_name)
+                       VALUES ($1, $2, $3)
                        RETURNING users.user_id;`,
-                values: [newUser.email, newUser.password],
+                values: [user.email, user.firstName, user.lastName],
               };
-            
-            const resultset = await this.client.query(insertNewUserQuery)
+
+            const resultset = await this.client.query(insertUserQuery)
             return Number(resultset.rows[0].user_id);
 
         } catch (error) {
@@ -68,4 +71,23 @@ export class Aloe extends Postgres {
             };
         };
     };
+
+    async getUserAuthentication(userId:number): Promise<UserAuthentication> {
+        const getUserAuthenticationQuery = {
+            name: `get-user-authentication-${userId}`,
+            text: `SELECT auth_id, user_id, password, created, modified
+                   FROM user_authentication
+                   WHERE user_authentication.user_id = $1;`,
+            values: [userId]
+        }
+        const resultset = await this.client.query(getUserAuthenticationQuery)
+        return <UserAuthentication> {
+            authId: Number(resultset.rows[0].auth_id),
+            userId: Number(resultset.rows[0].user_id),
+            password: resultset.rows[0].password,
+            created: new Date(resultset.rows[0].created),
+            modified: new Date(resultset.rows[0].modified),
+        }
+    };
+
 };
