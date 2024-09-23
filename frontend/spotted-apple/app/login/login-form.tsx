@@ -26,7 +26,7 @@ export default function LoginForm() {
     const [showPassword, setShowPassword] = useState('password');
     const [icon, setIcon] = useState(eyeOff);
     
-    const [state, formAction ] = useFormState(loginUser, initialState);
+    const [state, formAction] = useFormState(loginUser, initialState);
   
     useEffect(() => {
         const emailEntry = email.length != 0; // TODO: This isn't a good check

@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { Aloe } from '@/db/aloe';
 import User from '@/db/interfaces/user';
 import UserAuthentication from '@/db/interfaces/user-authentication';
+import { hashPassword } from '@/db/authentication';
 
 const CreateAccountFormSchema = z.object({
     firstName: z.string(),
@@ -58,7 +59,17 @@ export async function createAccount(prevState: CreateAccountState, formData: For
         db.connect();
         const newUserId = await db.insertUser(newUser)
         console.log(`NewUserID: ${newUserId}`)
-        // TODO: Create user_authentication record
+        
+        // Create user_authentication record
+        const [hash, salt] = await hashPassword(password)
+        const newUserAuthId = await db.insertUserAuthentication(
+            <UserAuthentication> {
+                userId: newUserId,
+                password: hash,
+                salt: salt
+            }
+        )
+        console.log(`NewUserAuthenticationID: ${newUserAuthId}`)
 
     } catch (error: any) {
         if(error.name === 'AloeExistingUserError' ) {
