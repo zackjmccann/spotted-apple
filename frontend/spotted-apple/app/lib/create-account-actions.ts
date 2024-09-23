@@ -3,6 +3,8 @@
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 import { Aloe } from '@/db/aloe';
+import User from '@/db/interfaces/user';
+import UserAuthentication from '@/db/interfaces/user-authentication';
 
 const CreateAccountFormSchema = z.object({
     firstName: z.string(),
@@ -44,21 +46,30 @@ export async function createAccount(prevState: CreateAccountState, formData: For
     };
 
     const { firstName, lastName, email, password } = validatedFields.data;
+    const newUser = <User> {
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+    };
+    
+    const db = new Aloe();
 
     try {
-        console.log(`firstName: ${firstName}`)
-        console.log(`lastName: ${lastName}`)
-        console.log(`email: ${email}`)
-        console.log(`password: ${password}`)
+        db.connect();
+        const newUserId = await db.insertUser(newUser)
+        console.log(`NewUserID: ${newUserId}`)
+        // TODO: Create user_authentication record
 
-    } catch (error) {
-        // If a database error occurs, return a more specific error.
-        return {
-            message: 'Database Error: Failed to create account.',
-        };
-    };
+    } catch (error: any) {
+        if(error.name === 'AloeExistingUserError' ) {
+            return { message: 'An account with that email already exists.' }
+        } else {
+            return { message: 'Internal error occurred. Please try again.'}
+        }
+    } finally {
+        db.close();
+    }
 
-    // Redirect the user.
-    redirect('/login'); // TODO: Decide on a relative landing page
+    redirect('/login');
 
 };

@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useFormState } from 'react-dom'
 
-import {Icon} from 'react-icons-kit';
+import {Icon} from 'react-icons-kit'; // TODO: This is throwing a bunch of warnings in the console
 import {eye} from 'react-icons-kit/feather/eye';
 import {eyeOff} from 'react-icons-kit/feather/eyeOff';
 
@@ -14,10 +14,8 @@ import styles from '@/app/ui/styles.module.css';
 
 export default function CreateForm() {
     const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!~@#$%]).{8,24}$/;;
-    const initialState: CreateAccountState = { message: null, errors: {} };
-    
     const userRef = useRef<HTMLInputElement>(null);
-
+  
     const [firstName, setFirstName] = useState('')
     const [validFirstName, setValidFirstName] = useState(false)
     
@@ -26,17 +24,18 @@ export default function CreateForm() {
     
     const [email, setEmail] = useState('')
     const [validEmail, setValidLEmail] = useState(false)
-
+    
     const [password, setPassword] = useState('');
     const [validPassword, setValidPassword] = useState(false);
-
+    
     const [showPassword, setShowPassword] = useState('password');
     const [icon, setIcon] = useState(eyeOff);
     
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
     const [validPasswordConfirmation, setValidPasswordConfirmation] = useState(false);
     const [passwordConfirmationFocus, setPasswordConfirmationFocus] = useState(false);
-
+    
+    const initialState: CreateAccountState = { errors: {}, message: null };
     const [state, formAction] = useFormState(createAccount, initialState);
 
     useEffect(() => {
@@ -61,7 +60,6 @@ export default function CreateForm() {
     }, [email])
 
     const handleToggle = () => {
-        console.log(`showPassword: ${showPassword}`)
         if (showPassword === 'password') {
             setIcon(eye);
             setShowPassword('text');
@@ -157,8 +155,9 @@ export default function CreateForm() {
                 >Create Account
                 </button>
                 <div aria-live="polite" aria-atomic="true">
-                    {state.errors?.email ? (<p className="mt-2 text-sm text-red-500">{state.errors.email}</p>) : null}
+                    { state.message != null ? (<p className="mt-2 text-sm text-red-500">{state.message}</p>) : null}
                 </div>
+
                 <Link className='text-sky-700 text-xs' href={'/login'}>Already have an account? Sign in</Link>
             </form>
     )
