@@ -2,21 +2,10 @@
 
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
-
-const CreateFormSchema = z.object({
-    firstName: z.string(),
-    lastName: z.string(),
-    email: z.string().email({ message: "Invalid email address" }),
-    password: z.string(),
-    confirmPassword: z.string()
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "The entered passwords do not match.",
-    path: ["confirmPassword"], // path of error
-  });
+import { Aloe } from '@/db/aloe';
 
 const LoginFormSchema = z.object({
-    email: z.string().email({ message: "Invalid email address" }),
+    email: z.string().email({ message: "Invalid email address or password." }),
     password: z.string()
   });
 
@@ -29,13 +18,11 @@ export type LoginState = {
 };
 
 export async function loginUser(prevState: LoginState, formData: FormData) {
-    // Validate form fields using Zod
     const validatedFields = LoginFormSchema.safeParse({
         email: formData.get('email'),
         password: formData.get('password'),
     });
 
-    // If form validation fails, return errors early. Otherwise, continue.
     if (!validatedFields.success) {
         return {
             errors: validatedFields.error.flatten().fieldErrors,
@@ -43,19 +30,17 @@ export async function loginUser(prevState: LoginState, formData: FormData) {
         };
     };
 
-    // Prepare data for validation against database
     const { email, password } = validatedFields.data;
 
-    // Login/Authentication logic 
     try {
-        const login = false;
+        console.log(`email: ${email}`)
+        console.log(`password: ${password}`)
 
     } catch (error) {
         // If a database error occurs, return a more specific error.
         return {
-        message: 'Database Error: Failed to log in.',
+            message: 'Database Error: Failed to log in.',
         };
-
     };
 
     // Redirect the user.

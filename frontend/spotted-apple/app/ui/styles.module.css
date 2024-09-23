@@ -1,0 +1,24 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+    gap: 1.5rem;
+    padding: 2.5rem;
+    border-radius: 9px;
+    background-color: whitesmoke;
+    box-shadow: 2px 2px 2px 1px rgb(2, 36, 137);
+  }
+
+.passwordConfirmationNote {
+  color: rgb(252, 69, 69);
+  font-size: small;
+}
+
+.showPassWordToggle {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  color: #00000082;
+}

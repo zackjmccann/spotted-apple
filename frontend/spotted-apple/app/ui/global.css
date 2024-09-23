@@ -28,15 +28,10 @@ body {
 
 input {
   color: rgb(0, 0, 0);
-  text-align: left;
   border-radius: 7px;
-  padding: 5%;
-  height: 5%;
+  height: 2.5rem;
   width: 100%;
-}
-
-form {
-  width: 50%;
+  padding: 0.5rem;
 }
 
 @layer utilities {

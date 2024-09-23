@@ -1,5 +1,8 @@
 export default interface User {
     userId: number,
     email: string,
-    created: Date
+    firstName: string,
+    lastName: string,
+    created: Date,
+    modified: Date
   };
