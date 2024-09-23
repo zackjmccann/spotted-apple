@@ -63,7 +63,7 @@ export class Aloe extends Postgres {
         };
     };
 
-    async insertUser(user:User): Promise<Number | unknown> {
+    async insertUser(user:User): Promise<Number> {
         try {
             const insertUserQuery = {
                 name: 'insert-user',
@@ -101,6 +101,25 @@ export class Aloe extends Postgres {
             created: new Date(resultset.rows[0].created),
             modified: new Date(resultset.rows[0].modified),
         }
+    };
+
+    async insertUserAuthentication(userAuthentication:UserAuthentication): Promise<Number | unknown> {
+        try {
+            const insertUserAuthenticationQuery = {
+                name: 'insert-user-authentication',
+                text: `INSERT INTO user_authentication (user_id, password)
+                       VALUES ($1, $2)
+                       RETURNING user_authentication.auth_id;`,
+                values: [userAuthentication.userId, userAuthentication.password],
+              };
+
+            const resultset = await this.client.query(insertUserAuthenticationQuery)
+            return Number(resultset.rows[0].user_id);
+
+        } catch (error: any) {
+            const errorMessage = `Failed to insert user authentication: ${error.message}`
+            throw new AloeError(errorMessage);
+        };
     };
 
 };
