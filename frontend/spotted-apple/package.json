@@ -21,10 +21,12 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^20",
     "@types/pg": "^8.11.10",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "bcrypt": "^5.1.1",
     "eslint": "^8",
     "eslint-config-next": "14.2.11",
     "postcss": "^8",
