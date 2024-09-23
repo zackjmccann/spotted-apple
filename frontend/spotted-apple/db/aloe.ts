@@ -2,6 +2,20 @@ import { Postgres } from "./postgres";
 import User from "./interfaces/user" // TODO: Target this import statement: import { User } from "@/app/lib/definitions"
 import UserAuthentication from "./interfaces/user-authentication"
 
+export class AloeError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'AloeError';
+    };
+};
+
+export class AloeExistingUserError extends AloeError {
+    constructor(message: string = 'An account with that email already exists.') {
+        super(message);
+        this.name = 'AloeExistingUserError';
+    };
+};
+
 export class Aloe extends Postgres {
     constructor() {
         super();
@@ -62,13 +76,12 @@ export class Aloe extends Postgres {
             const resultset = await this.client.query(insertUserQuery)
             return Number(resultset.rows[0].user_id);
 
-        } catch (error) {
-            if(error instanceof Error) {
-                console.log(error.message);
-                return -1;
-            } else {
-                return error;
-            };
+        } catch (error: any) {
+            if (error.message === 'duplicate key value violates unique constraint "users_email_key"') {
+                throw new AloeExistingUserError;
+            }
+            const errorMessage = `Failed to insert user: ${error.message}`
+            throw new AloeError(errorMessage);
         };
     };
 

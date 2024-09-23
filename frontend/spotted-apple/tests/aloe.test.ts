@@ -1,4 +1,4 @@
-import { Aloe } from '../db/aloe'
+import { Aloe, AloeExistingUserError } from '../db/aloe'
 import { afterAll, beforeAll, expect, describe, it } from 'vitest'
 import User from "../db/interfaces/user"
 
@@ -41,15 +41,17 @@ describe('Insert user', async () => {
 });
 
 describe('Insert existing user', async () => {
-    it('should return -1 due to the presented user already existing in the users relation', async () => {
+    it('should return an AloeExistingError due to the presented user already existing in the users relation', async () => {
         let newUser = <User> {
             email: testEmail,
             firstName: testFirstName,
             lastName: testLastName,
         };
-
-        let newUserId = await db.insertUser(newUser)
-        expect(newUserId).toBeLessThan(0);
+        try {
+            await db.insertUser(newUser)
+        } catch(error) {
+            expect(error).toBeInstanceOf(AloeExistingUserError);
+        }
     });
 });
 
