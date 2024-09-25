@@ -2,10 +2,10 @@
 
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
-import { Aloe } from '@/db/aloe';
-import User from '@/db/interfaces/user';
-import UserAuthentication from '@/db/interfaces/user-authentication';
-import { hashPassword } from '@/db/authentication';
+import { Aloe } from '@/app/api/db/aloe';
+import User from '@/app/api/db/interfaces/user';
+import UserAuthentication from '@/app/api/db/interfaces/user-authentication';
+import { hashPassword } from '@/app/api/db/authentication';
 
 const CreateAccountFormSchema = z.object({
     firstName: z.string(),
