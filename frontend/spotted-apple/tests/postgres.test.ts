@@ -1,4 +1,4 @@
-import { Postgres } from '../db/postgres'
+import { Postgres } from '../app/api/db/postgres'
 import { afterAll, beforeAll, expect, describe, it } from 'vitest'
 
 let pg = new Postgres()

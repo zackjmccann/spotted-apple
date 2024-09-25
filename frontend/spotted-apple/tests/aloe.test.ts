@@ -1,6 +1,6 @@
-import { Aloe, AloeExistingUserError } from '../db/aloe'
+import { Aloe, AloeExistingUserError } from '../app/api/db/aloe'
 import { afterAll, beforeAll, expect, describe, it } from 'vitest'
-import User from "../db/interfaces/user"
+import User from "../app/api/db/interfaces/user"
 
 let db = new Aloe()
 let testEmail = 'unit_test_user@email.com'
