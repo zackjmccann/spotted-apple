@@ -12,7 +12,7 @@ const links = [
       {
         key: 'login',
         name: 'Login',
-        href: '/login',
+        href: '/api/auth/login',
         description: 'Already a user? Log in to access your account.'
       },
       { 
@@ -26,6 +26,12 @@ const links = [
         name: 'About',
         href: '/',
         description: 'Explore Spotted Apple and our mission.'
+    },
+      { 
+        key: 'logout',
+        name: 'Logout',
+        href: '/api/auth/logout',
+        description: 'Logout'
     },
   ];
 
