@@ -1,14 +1,38 @@
-FROM postgres:15.0
+FROM python:3.12.4-bookworm
 
-ENV HOME=/db
-ENV PORT=5432
+ARG UID=1000
+ARG GID=1000
+ENV HOME=/app
+ENV VIRTUAL_ENV=${HOME}/.venv/env
+ENV PORT=8000
 
 WORKDIR ${HOME}
-    
-COPY bin/ /docker-entrypoint-initdb.d/
-COPY --chown=999:999 config/ ./config
-RUN chmod 0755 config/*
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends build-essential curl libpq-dev \
+  && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man \
+  && apt-get clean \
+  && groupadd -g "${GID}" apple \
+  && useradd --create-home --no-log-init -u "${UID}" -g "${GID}" spotted \
+  && chown spotted:apple -R ${HOME}
+
+USER spotted
+
+COPY --chown=spotted:apple requirements*.txt ./
+COPY --chown=spotted:apple bin/ ./bin
+COPY --chown=spotted:apple . .
+
+RUN chmod 0755 bin/* && bin/install
+
+ARG FLASK_DEBUG="false"
+ENV FLASK_DEBUG="${FLASK_DEBUG}" \
+    FLASK_APP="src.app" \
+    FLASK_SKIP_DOTENV="true" \
+    PYTHONUNBUFFERED="true" \
+    PYTHONPATH="." \
+    PATH=${HOME}/.local/bin:${PATH} \
+    USER="spotted"
 
 EXPOSE ${PORT}
 
-CMD [ "postgres", "-c", "config_file=/config/postgresql.conf"]
+CMD [ "gunicorn", "-c", "./config/gunicorn.py", "src.app:create_app()" ]
