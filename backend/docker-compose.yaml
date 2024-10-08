@@ -1,0 +1,22 @@
+name: backend-client-test
+services:
+  web:
+    build: .
+    image: us-east1-docker.pkg.dev/spotted-apple/backend/client-test:0.0.1-dev
+    container_name: backend-client
+    networks:
+      - backend_aloe_default
+    env_file:
+      - '.env'
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    deploy:
+      resources:
+        limits:
+          cpus: "${DOCKER_WEB_CPUS:-0}"
+          memory: "${DOCKER_WEB_MEMORY:-0}"
+    ports:
+      - "${DOCKER_WEB_PORT_FORWARD:-127.0.0.1:8000}:${PORT:-8000}"
+
+networks:
+  backend_aloe_default:
+    external: true
