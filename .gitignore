@@ -181,6 +181,3 @@ archive/
 
 # JSON
 *.json
-
-# K8 deployments configurations are ignored from this project
-deploy/
