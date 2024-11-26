@@ -2,8 +2,7 @@ FROM python:3.12.4-bookworm
 
 ARG UID=1000
 ARG GID=1000
-ENV HOME=/app
-ENV VIRTUAL_ENV=${HOME}/.venv/env
+ENV HOME=/db
 ENV PORT=8000
 
 WORKDIR ${HOME}
@@ -30,7 +29,7 @@ ENV FLASK_DEBUG="${FLASK_DEBUG}" \
     FLASK_SKIP_DOTENV="true" \
     PYTHONUNBUFFERED="true" \
     PYTHONPATH="." \
-    PATH=${HOME}/.local/bin:${PATH} \
+    PATH=/${HOME}/.local/bin:${PATH} \
     USER="spotted"
 
 EXPOSE ${PORT}
