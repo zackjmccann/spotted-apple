@@ -28,7 +28,7 @@ ENV FLASK_DEBUG="${FLASK_DEBUG}" \
     FLASK_APP="src.app" \
     FLASK_SKIP_DOTENV="true" \
     PYTHONUNBUFFERED="true" \
-    PYTHONPATH="." \
+    PYTHONPATH=${HOME}/src:/src \
     PATH=/${HOME}/.local/bin:${PATH} \
     USER="spotted"
 
