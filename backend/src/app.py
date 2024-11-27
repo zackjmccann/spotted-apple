@@ -1,7 +1,8 @@
 import os
-# from config.sa_logger import logger
-from flask import Flask
-from src import db
+from flask import Flask, jsonify
+from database.aloe import connect, close, init_app
+from users.routes import users_blueprint
+from spotted_apple_logging import logger
 
 
 def create_app(test_config=None):
@@ -15,24 +16,28 @@ def create_app(test_config=None):
     try:
         os.makedirs(app.instance_path)
     except OSError:
-        pass
-        # logger.debug('Instance file exists')
+        logger.debug('Instance file exists')
 
-    @app.route("/hello")
-    def hello():
-        conn = db.get_db()
+    @app.route("/")
+    def main():
+        conn = connect()
         cursor = conn.cursor()
         cursor.execute("SELECT 1;")
         conn.commit()
         result = cursor.fetchone()
         cursor.close()
 
-        return f"Hello here is your result {result}!"
+        data = {
+            'status': 'success',
+            'message': f"Main result {result[0]}!",
+        }
+        return jsonify(data), 201
 
     @app.errorhandler(500)
     def server_error(e):
         return "An internal error occurred.", 500
 
-    db.init_app(app)
+    init_app(app)
+    app.register_blueprint(users_blueprint, url_prefix='/users')
 
     return app
