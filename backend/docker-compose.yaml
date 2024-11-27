@@ -15,3 +15,16 @@ services:
           memory: "${DOCKER_WEB_MEMORY:-0}"
     ports:
       - "${DOCKER_WEB_PORT_FORWARD:-127.0.0.1:8000}:${PORT:-8000}"
+
+  local_pg:
+    image: postgres:16.6-bullseye
+    container_name: local-pg
+    env_file:
+      - '.env'
+    volumes:
+      - local_pg:/var/lib/pgsql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  local_pg:
