@@ -3,7 +3,7 @@ Class abstraction of a PostgreSQL Database
 """
 import os
 import psycopg2
-from psycopg2 import Error
+from psycopg2 import Error, extras
 
 class Postgres:
     def __init__(self):
@@ -22,14 +22,22 @@ class Postgres:
     def _get_connection_string(self):
         return (f'postgresql://{self.client_username}:{self.client_password}'
                 f'@{self.service}/{self.database}')
+    
+    def close_connections(self):
+        # TODO: Explore pooling, or reaching out to server to explictly close all connections
+        pass
 
-    def execute_query(self, query_data: dict):
+    def execute_query(self, query_data: dict, return_method: str, cursor_type: str = None):
         with self.get_connection() as conn:
-            try:
+            if cursor_type:
+                cursor = conn.cursor(cursor_factory=getattr(extras, cursor_type))
+            else:
                 cursor = conn.cursor()
-                cursor.execute(query_data['text'])
+
+            try:
+                cursor.execute(query_data['text'], query_data['values'])
                 conn.commit()
-                result = cursor.fetchone()
+                result = getattr(cursor, return_method)()
                 cursor.close()
                 return result
 
