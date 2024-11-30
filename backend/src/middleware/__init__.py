@@ -1,5 +1,5 @@
-from backend.src.middleware.auth import Authenticator
-from backend.src.middleware import routes
+from src.middleware.auth import Authenticator
+from src.middleware import routes
 
 __all__ = [
     'Authenticator',

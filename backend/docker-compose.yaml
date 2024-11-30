@@ -1,10 +1,10 @@
-name: backend-client-test
+name: backend
 services:
-  db:
+  backend_server:
     build: .
-    image: zackjmccann/backend-client-dev:0.0.1-dev
+    image: zackjmccann/backend-server-dev:0.0.1-dev
     # image: us-east1-docker.pkg.dev/spotted-apple/backend/client-test:0.0.1-dev
-    container_name: backend-local-client
+    container_name: backend-server-dev
     env_file:
       - '.env'
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
@@ -14,7 +14,7 @@ services:
           cpus: "${DOCKER_WEB_CPUS:-0}"
           memory: "${DOCKER_WEB_MEMORY:-0}"
     ports:
-      - "${DOCKER_WEB_PORT_FORWARD:-127.0.0.1:8000}:${PORT:-8000}"
+      - "8000:8000"
 
   local_pg:
     image: postgres:16.6-bullseye
@@ -22,9 +22,9 @@ services:
     env_file:
       - '.env'
     volumes:
-      - local_pg:/var/lib/pgsql/data
+      - local_pg_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
 volumes:
-  local_pg:
+  local_pg_data:
