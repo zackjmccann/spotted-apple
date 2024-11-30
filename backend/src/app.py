@@ -1,6 +1,7 @@
 import os
 from flask import Flask, jsonify
-from database.aloe import connect, close, init_app
+from database.aloe import init_app
+from middleware import Authenticator, routes
 from users.routes import users_blueprint
 from spotted_apple_logging import logger
 
@@ -20,16 +21,9 @@ def create_app(test_config=None):
 
     @app.route("/")
     def main():
-        conn = connect()
-        cursor = conn.cursor()
-        cursor.execute("SELECT 1;")
-        conn.commit()
-        result = cursor.fetchone()
-        cursor.close()
-
         data = {
             'status': 'success',
-            'message': f"Main result {result[0]}!",
+            'message': 'Spotted Apple Backend',
         }
         return jsonify(data), 201
 
@@ -38,6 +32,8 @@ def create_app(test_config=None):
         return "An internal error occurred.", 500
 
     init_app(app)
+    app.wsgi_app = Authenticator(app.wsgi_app)
+    app.register_blueprint(routes.auth_blueprint, url_prefix='/auth')
     app.register_blueprint(users_blueprint, url_prefix='/users')
 
     return app

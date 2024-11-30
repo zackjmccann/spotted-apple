@@ -1,3 +1,4 @@
+import requests
 from flask import Blueprint, request, jsonify
 from database.aloe import Aloe
 from users.models import User
@@ -7,12 +8,6 @@ aloe = Aloe()
 
 @users_blueprint.route('/get', methods=['GET'])
 def get_user():
-    if request.is_json:
-        return jsonify({
-            'status': 'error',
-            'message': 'Bad request: this enpoint does not accept JSON'
-        }), 400
-
     try:
         query_parameters = request.args
         id = int(query_parameters.get('id', None))
@@ -39,12 +34,6 @@ def create_user():
         - first_name
         - last_name
     """
-    if request.is_json:
-        return jsonify({
-            'status': 'error',
-            'message': 'Bad request: this enpoint does not accept JSON'
-        }), 400
-
     query_parameters = request.args
     user_data = {
         'email': query_parameters.get('email', None),
@@ -70,12 +59,6 @@ def create_user():
 
 @users_blueprint.route('/delete', methods=['POST'])
 def delete_user():
-    if request.is_json:
-        return jsonify({
-            'status': 'error',
-            'message': 'Bad request: this enpoint does not accept JSON'
-        }), 400
-
     try:
         query_parameters = request.args
         id = int(query_parameters.get('id', None))
