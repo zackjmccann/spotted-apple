@@ -1,28 +1,62 @@
 from flask import Blueprint, request, jsonify
-from database.aloe import Aloe
-from middleware.auth import issue_token
+from middleware.auth import issue_token, validate_token, authenticate_with_database
+from spotted_apple_logging import logger
 
 auth_blueprint = Blueprint('auth', __name__)
-aloe = Aloe()
 
-@auth_blueprint.route('/', methods=['POST'])
-def login():
-    client_credentials = {
-        'username': request.json.get('username', None),
-        'password': request.json.get('password', None),
-        'id': request.json.get('id', None),
-        }
-    response = aloe.client_login(client_credentials)
+class AuthenticationException(BaseException):
+    pass
 
-    if not response['valid']:
+@auth_blueprint.route('/token', methods=['POST'])
+def get_token():
+    try:
+        data = request.get_json()
+
+        if data['grant_type'] == 'client_credentials':
+            client_credentials = {
+                'username': data.get('username', None),
+                'password': data.get('password', None),
+                'id': data.get('id', None),
+                }
+            response = authenticate_with_database(client_credentials)
+
+        elif data['grant_type'] == 'refresh_token':
+            response = validate_token(data.get('refresh_token', None))
+
+        else:
+            response = {'valid': False}
+
+        if not response['valid']:
+            return jsonify({
+                'status': 'failed',
+                'message': response['message']
+                }), response['status']
+
+        token = issue_token(response['username'], response['id'])
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Access Granted',
+            'token': token
+            }), 200
+
+    except (TypeError, KeyError):
         return jsonify({
             'status': 'failed',
-            'message': 'unauthorized client'
-            }), 401
-    
-    token = issue_token(client_credentials['username'])
-    return jsonify({
-        'status': 'success',
-        'message': 'Access Granted',
-        'access_token': token
-        }), 200
+            'message': 'unable to process authorization request'
+            }), 400
+
+@auth_blueprint.route('/introspect', methods=['POST'])
+def introspect_token():
+    try:
+        data = request.get_json()
+        response = validate_token(data.get('refresh_token', None))
+        if not response['valid']:
+            return jsonify({ 'status': 'invalid', }), 201
+        else:
+            return jsonify({ 'status': 'valid', }), 201
+    except (TypeError, AttributeError):
+        return jsonify({
+            'status': 'failed',
+            'message': 'unable to process authorization request'
+            }), 400
