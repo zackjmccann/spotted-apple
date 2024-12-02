@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from middleware.auth import issue_token, validate_token, authenticate_with_database
-from spotted_apple_logging import logger
+
 
 auth_blueprint = Blueprint('auth', __name__)
 
@@ -50,11 +50,11 @@ def get_token():
 def introspect_token():
     try:
         data = request.get_json()
-        response = validate_token(data.get('refresh_token', None))
+        response = validate_token(data.get('token', None))
         if not response['valid']:
-            return jsonify({ 'status': 'invalid', }), 201
+            return jsonify({ 'valid': False, }), 201
         else:
-            return jsonify({ 'status': 'valid', }), 201
+            return jsonify({ 'valid': True, }), 201
     except (TypeError, AttributeError):
         return jsonify({
             'status': 'failed',

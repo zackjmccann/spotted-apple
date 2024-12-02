@@ -4,7 +4,6 @@ import json
 import datetime
 from database.aloe import Aloe
 from werkzeug.wrappers import Request, Response
-from spotted_apple_logging import logger
 
 
 def authenticate_with_database(credentials):
@@ -39,7 +38,6 @@ def issue_token(username, id):
     return jwt.encode(data, secret_key, algorithm)
 
 def validate_token(token):
-    logger.info(f'token: {token}')
     if not token:
         return {
             'valid': False,
