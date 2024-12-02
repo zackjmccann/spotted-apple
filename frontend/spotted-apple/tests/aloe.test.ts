@@ -1,6 +1,5 @@
-import { Aloe } from '../db/aloe'
+import { Aloe } from '../backend/aloe'
 import { expect, describe, it } from 'vitest'
-import NewUser from "../db/interfaces/new-user"
 
 let db = new Aloe()
 let testEmail = 'unit_test_user@email.com'
