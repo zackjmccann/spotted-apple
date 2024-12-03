@@ -26,17 +26,62 @@ body {
     rgb(var(--background-start-rgb));
 }
 
-input {
-  color: rgb(0, 0, 0);
-  text-align: left;
+.createAccount{
+  padding: 1rem;
+  background-color: rgb(236, 234, 234);
+  align-items: center;
+  width: 50%;
   border-radius: 7px;
-  padding: 5%;
-  height: 5%;
-  width: 100%;
+
+  input {
+    color: rgb(0, 0, 0);
+    text-align: left;
+    border-radius: 7px;
+    margin: .5rem;
+    padding: .75rem;
+    height: 2.75rem;
+    width: 100%;
+  }
+  
+  p {
+    color: rgba(0, 0, 0, 0.59);
+    padding: .15rem;
+    margin: .5rem;
+  }
+
+  .errorField {
+    font-size: 0.75rem;
+    color: rgba(250, 7, 7, 0.75);
+  }
+
 }
 
-form {
+.setPassword{
+  padding: 1rem;
+  background-color: rgb(236, 234, 234);
+  align-items: center;
   width: 50%;
+  border-radius: 7px;
+
+  input {
+    color: rgb(0, 0, 0);
+    text-align: left;
+    border-radius: 7px;
+    margin: .5rem;
+    padding: .75rem;
+    height: 2.75rem;
+    width: 100%;
+  }
+}
+
+button {
+  background-color: rgb(37, 61, 220);
+  text-align: center;
+  border-radius: 7px;
+  margin: .5rem;
+  padding: .75rem;
+  height: 2.75rem;
+  width: 100%;
 }
 
 @layer utilities {
