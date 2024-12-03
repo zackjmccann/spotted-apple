@@ -3,18 +3,6 @@
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 
-const CreateFormSchema = z.object({
-    firstName: z.string(),
-    lastName: z.string(),
-    email: z.string().email({ message: "Invalid email address" }),
-    password: z.string(),
-    confirmPassword: z.string()
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "The entered passwords do not match.",
-    path: ["confirmPassword"], // path of error
-  });
-
 const LoginFormSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
     password: z.string()
@@ -27,6 +15,7 @@ export type LoginState = {
     };
     message?: string | null;
 };
+
 
 export async function loginUser(prevState: LoginState, formData: FormData) {
     // Validate form fields using Zod
