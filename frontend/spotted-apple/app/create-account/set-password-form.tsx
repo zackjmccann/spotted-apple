@@ -1,6 +1,6 @@
 'use client';
 
-import { setPassword, SetPasswordState } from '@/app/lib/create-account/set-password-actions';
+import { setPassword, SetPasswordState } from '@/app/modules/create-account/set-password-actions';
 import { useFormStatus, useFormState } from 'react-dom'
 
 export default function SetPasswordForm() {

@@ -1,4 +1,4 @@
-import User from "./interfaces/user" // TODO: Target this import statement: import { User } from "@/app/lib/definitions"
+import User from "./schemas/user" // TODO: Target this import statement: import { User } from "@/app/lib/definitions"
 
 export class Aloe {
     private backendServer: string;

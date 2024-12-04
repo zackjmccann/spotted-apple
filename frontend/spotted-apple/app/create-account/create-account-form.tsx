@@ -1,6 +1,6 @@
 'use client';
 
-import { createAccount, CreateAccountState } from '@/app/lib/create-account/create-account-actions';
+import { createAccount, CreateAccountState } from '@/app/modules/create-account/create-account-actions';
 import { useFormStatus, useFormState } from 'react-dom'
 
 function SubmitButton() {

@@ -1,6 +1,6 @@
 'use client';
 
-import { loginUser, LoginState } from '@/app/lib/actions';
+import { loginUser, LoginState } from '@/app/modules/actions';
 import { useActionState } from 'react';
 import { useFormStatus, useFormState } from 'react-dom'
 
