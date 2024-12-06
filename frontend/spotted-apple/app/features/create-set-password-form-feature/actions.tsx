@@ -1,7 +1,7 @@
 "use client";
 
-import { SetPasswordState } from '@/app/features/create-set-password-form-feature/types'
 import { SetPasswordFormSchema } from '@/app/features/create-set-password-form-feature/schemas'
+import { SignUpState } from '@/app/features/sign-up-feature/types'
 
 function validateFields(formData: FormData) {
     return SetPasswordFormSchema.safeParse({
@@ -11,7 +11,7 @@ function validateFields(formData: FormData) {
     })
 }
 
-export async function setPassword(prevState: SetPasswordState, formData: FormData,) {
+export async function setPassword(prevState: SignUpState, formData: FormData,) {
     const validatedFields = validateFields(formData);
     const enterValues: { [key: string]: string } = {};
     formData.forEach((value, key) => { enterValues[key] = value.toString(); });
@@ -19,10 +19,12 @@ export async function setPassword(prevState: SetPasswordState, formData: FormDat
     if (!validatedFields.success) {
         const formErrors = validatedFields.error.flatten().fieldErrors;
         return {
+            created: prevState.created,
             passwordSet: false,
             errors: formErrors,
             formData: enterValues};
     };
 
-    return {passwordSet: true, formData: enterValues} as SetPasswordState;
+    return {created: prevState.created, passwordSet: true, formData: enterValues} as SignUpState;
+    ;
 };

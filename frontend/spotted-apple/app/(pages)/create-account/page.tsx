@@ -10,7 +10,7 @@ import SetPasswordForm from '@/app/features/create-set-password-form-feature/for
 export default function Page() {
   const initialSignUpState: SignUpState = {created: false, passwordSet: false};
   const [state, formAction] = signUp(initialSignUpState)
-  const signUpProps: SignUpProps = { state: state, formAction: formAction}
+  const signUpProps: any = { state: state, formAction: formAction} // TODO: Properly deconstruct/return the above for typing
 
   return (
     <main className="flex min-h-screen flex-row items-center justify-around p-12">

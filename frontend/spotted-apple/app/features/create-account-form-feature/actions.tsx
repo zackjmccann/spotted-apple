@@ -1,7 +1,7 @@
 "use client";
 
 import { CreateAccountFormSchema } from '@/app/features/create-account-form-feature/schemas'
-import {SignUpState} from '@/app/features/sign-up-feature/types'
+import { SignUpState } from '@/app/features/sign-up-feature/types'
 
 function validateFields(formData: FormData) {
     return CreateAccountFormSchema.safeParse({

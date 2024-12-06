@@ -7,10 +7,10 @@ import { SignUpState} from '@/app/features/sign-up-feature/types'
 
 export default function signUp(state: SignUpState) {
     if (!state.created) {
-        return useActionState(createAccount, state);
-    }
-    
-    if (state.passwordSet) {
-        return useActionState(setPassword, state);
+        const [formState, formAction] = useActionState(createAccount, state);
+        return [formState, formAction]
+    } else {
+        const [formState, formAction] = useActionState(setPassword, state);
+        return [formState, formAction]
     }
 };
