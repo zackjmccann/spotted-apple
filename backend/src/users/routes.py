@@ -18,6 +18,12 @@ def get_user():
         }), 400
     
     query_response = aloe.get_user(id=id)
+    if not query_response:
+        return jsonify({
+            'status': 'error',
+            'message': 'No user found with provided id'
+        }), 404
+
     user = User(query_response)
 
     return jsonify({

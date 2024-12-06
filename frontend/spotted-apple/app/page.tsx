@@ -1,4 +1,4 @@
-import HomeLinks from '@/app/ui/home-links'
+import HomeLinks from '@/app/features/home-links-feature/components'
 
 export default function Home() {
   return (
@@ -11,4 +11,4 @@ export default function Home() {
         </div>
       </main>
   );
-}
+};

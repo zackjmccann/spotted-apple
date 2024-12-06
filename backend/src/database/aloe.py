@@ -59,9 +59,11 @@ class Aloe(Postgres):
             return_method='fetchone',
             cursor_type='RealDictCursor')
 
-    def client_login(self, client_credentials):
+    def authenticate_client(self, client_credentials):
         query_data = {
-            'text': f'SELECT TRUE AS valid '
+            'text': f'SELECT TRUE     AS valid, '
+                    f'       username AS username, '
+                    f'       id       AS id '
                     f'FROM clients '
                     f'WHERE username = %(username)s '
                     f'AND password = %(password)s '
