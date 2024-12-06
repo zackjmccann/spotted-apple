@@ -1,7 +1,7 @@
 "use client";
 
-import { CreateAccountState } from '@/app/features/create-form-feature/types'
-import { CreateAccountFormSchema } from '@/app/features/create-form-feature/schemas'
+import { CreateAccountState } from '@/app/features/create-account-form-feature/types'
+import { CreateAccountFormSchema } from '@/app/features/create-account-form-feature/schemas'
 
 function validateFields(formData: FormData) {
     return CreateAccountFormSchema.safeParse({
@@ -15,8 +15,8 @@ export async function createAccount(prevState: CreateAccountState, formData: For
     const validatedFields = validateFields(formData);
     if (!validatedFields.success) {
         const formErrors = validatedFields.error.flatten().fieldErrors;
-        const enterValues: { [key: string]: string | File } = {};
-        formData.forEach((value, key) => { enterValues[key] = value; });
+        const enterValues: { [key: string]: string } = {};
+        formData.forEach((value, key) => { enterValues[key] = value.toString(); });
         return {
             created: false,
             errors: formErrors,

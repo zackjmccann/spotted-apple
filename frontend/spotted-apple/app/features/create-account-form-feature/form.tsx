@@ -1,10 +1,10 @@
 'use client';
 
 import { ChangeEvent, useActionState, useState, } from 'react'
-import { FormField, FormFieldError, SubmitButton } from '@/app/features/create-form-feature/components'
-import { InputFields, ButtonDisplay } from '@/app/features/create-form-feature/types'
-import { CreateAccountState, InputFieldErrorState } from '@/app/features/create-form-feature/types';
-import { createAccount } from '@/app/features/create-form-feature/actions';
+import { FormField, FormFieldError, SubmitButton } from '@/app/lib/forms/components'
+import { ButtonDisplay, InputFields, InputFieldErrorState} from '@/app/lib/forms/types'
+import { CreateAccountState } from '@/app/features/create-account-form-feature/types';
+import { createAccount } from '@/app/features/create-account-form-feature/actions';
 
 export default function CreateAccountForm() {
     const initialState: CreateAccountState = {created: false};
@@ -33,26 +33,25 @@ export default function CreateAccountForm() {
         if (state.errors && state.errors[currentlySelectedInputField]) {
             displayError(currentDisplay => ({ ...currentDisplay, [currentlySelectedInputField]: enteredValueIsBlank }))
         }
-        console.log(`errorState 2: ${JSON.stringify(errorState)}`)
     };
 
     const fields: InputFields = [
         {
             id: 'email',
             placeHolder: 'example@email.com',
-            initialValue: intputState ? intputState.email.toString() : "",
+            initialValue: intputState && intputState.email ? intputState.email : "",
             onChange: onChange,
         },
         {
             id: 'firstName',
             placeHolder: 'First Name',
-            initialValue: intputState ? intputState.firstName.toString() : "",
+            initialValue: intputState && intputState.firstName ? intputState.firstName : "",
             onChange: onChange
         },
         {
             id: 'lastName',
             placeHolder: 'Last Name',
-            initialValue: intputState ? intputState.lastName.toString() : "",
+            initialValue: intputState && intputState.lastName ? intputState.lastName : "",
             onChange: onChange
         },
     ]
@@ -75,7 +74,7 @@ export default function CreateAccountForm() {
                 </div>
                 ))}
             </ul>
-            <SubmitButton key='createAccountSubmittButton' {...buttonValues}/>
+            <SubmitButton key='createAccountSubmitButton' {...buttonValues}/>
         </form>
     )
 };

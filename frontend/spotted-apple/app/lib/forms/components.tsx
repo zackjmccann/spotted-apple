@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormStatus } from 'react-dom'
-import { InputField, ButtonDisplay, InputFieldsErrors} from '@/app/features/create-form-feature/types'
+import { InputField, ButtonDisplay, InputFieldsErrors} from '@/app/lib/forms/types'
 
 export function FormField({id, placeHolder, initialValue, onChange}: InputField) {
     return (<input
