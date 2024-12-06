@@ -14,7 +14,6 @@ export type ButtonDisplay = {
     pendingDisplay: string;
 }
 
-
 export type InputFieldsErrors = {
     errors: string[];
 }

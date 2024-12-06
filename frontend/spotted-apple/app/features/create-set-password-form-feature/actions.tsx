@@ -13,17 +13,16 @@ function validateFields(formData: FormData) {
 
 export async function setPassword(prevState: SetPasswordState, formData: FormData,) {
     const validatedFields = validateFields(formData);
+    const enterValues: { [key: string]: string } = {};
+    formData.forEach((value, key) => { enterValues[key] = value.toString(); });
+
     if (!validatedFields.success) {
         const formErrors = validatedFields.error.flatten().fieldErrors;
-        const enterValues: { [key: string]: string | File } = {};
-        formData.forEach((value, key) => { enterValues[key] = value; });
         return {
             passwordSet: false,
             errors: formErrors,
             formData: enterValues};
     };
 
-
-    return {passwordSet: true} as SetPasswordState;
-
+    return {passwordSet: true, formData: enterValues} as SetPasswordState;
 };

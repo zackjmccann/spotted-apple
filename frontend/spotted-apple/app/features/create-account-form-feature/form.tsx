@@ -1,15 +1,12 @@
 'use client';
 
-import { ChangeEvent, useActionState, useState, } from 'react'
+import { ChangeEvent, useState, } from 'react'
 import { FormField, FormFieldError, SubmitButton } from '@/app/lib/forms/components'
 import { ButtonDisplay, InputFields, InputFieldErrorState} from '@/app/lib/forms/types'
-import { CreateAccountState } from '@/app/features/create-account-form-feature/types';
-import { createAccount } from '@/app/features/create-account-form-feature/actions';
+import { CreateAccountFormProps } from '@/app/features/create-account-form-feature/types';
 
-export default function CreateAccountForm() {
-    const initialState: CreateAccountState = {created: false};
+export default function CreateAccountForm({state, formAction}: CreateAccountFormProps) {
     const initialErrorState: InputFieldErrorState = {email: true, firstName: true, lastName: true};
-    const [state, formAction] = useActionState(createAccount, initialState);
     const [intputState, setInput] = useState(state.formData);
     const [errorState, displayError] = useState(initialErrorState) 
     

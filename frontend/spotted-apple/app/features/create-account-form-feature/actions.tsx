@@ -1,7 +1,7 @@
 "use client";
 
-import { CreateAccountState } from '@/app/features/create-account-form-feature/types'
 import { CreateAccountFormSchema } from '@/app/features/create-account-form-feature/schemas'
+import {SignUpState} from '@/app/features/sign-up-feature/types'
 
 function validateFields(formData: FormData) {
     return CreateAccountFormSchema.safeParse({
@@ -11,24 +11,19 @@ function validateFields(formData: FormData) {
     })
 }
 
-export async function createAccount(prevState: CreateAccountState, formData: FormData,) {
+export async function createAccount(prevState: SignUpState, formData: FormData,) {
     const validatedFields = validateFields(formData);
+    const enterValues: { [key: string]: string } = {};
+    formData.forEach((value, key) => { enterValues[key] = value.toString(); });
+
     if (!validatedFields.success) {
         const formErrors = validatedFields.error.flatten().fieldErrors;
-        const enterValues: { [key: string]: string } = {};
-        formData.forEach((value, key) => { enterValues[key] = value.toString(); });
         return {
             created: false,
+            passwordSet: false,
             errors: formErrors,
             formData: enterValues};
     };
 
-    const { firstName, lastName, email} = validatedFields.data;
-    // Check if an account already exists
-    const existingAccount = true;
-    // // If not, collect and store email in browser, render a password creation template
-    const cookieCreated = false;
-    // return existingAccount;
-    return {created: true} as CreateAccountState;
-
+    return { created: true, passwordSet: false, formData: enterValues, } as SignUpState;
 };

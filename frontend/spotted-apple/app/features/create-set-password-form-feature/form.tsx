@@ -1,16 +1,14 @@
 'use client';
 
-import { ChangeEvent, useActionState, useState, } from 'react'
-import { SetPasswordState } from '@/app/features/create-set-password-form-feature/types';
+import { ChangeEvent, useState, } from 'react'
 import { FormField, FormFieldError, SubmitButton } from '@/app/lib/forms/components'
 import { ButtonDisplay, InputFields, InputFieldErrorState} from '@/app/lib/forms/types'
-import { setPassword } from '@/app/features/create-set-password-form-feature/actions';
+import { SetPasswordFormProps } from '@/app/features/create-set-password-form-feature/types';
 
-export default function SetPasswordForm() {
+
+export default function SetPasswordForm({state, formAction}: SetPasswordFormProps) {
     // TODO: Display one error message at the bottom, not per field
-    const initialState: SetPasswordState = {passwordSet: false};
-    const initialErrorState: InputFieldErrorState = {email: true, passWord: true, confirmPassword: true};
-    const [state, formAction] = useActionState(setPassword, initialState);    
+    const initialErrorState: InputFieldErrorState = {email: true, password: true, confirmPassword: true};
     const [intputState, setInput] = useState(state.formData);
     const [errorState, displayError] = useState(initialErrorState) 
 
@@ -39,17 +37,15 @@ export default function SetPasswordForm() {
     const fields: InputFields = [
         {
             id: 'email',
-            initialValue: intputState ? intputState.email.toString() : "",
+            initialValue: intputState && intputState.email ? intputState.email : "",
             onChange: onChange,
         },
         {
             id: 'password',
-            initialValue: intputState ? intputState.password.toString() : "",
             onChange: onChange
         },
         {
             id: 'confirmPassword',
-            initialValue: intputState ? intputState.confirmPassword.toString() : "",
             onChange: onChange
         },
     ]
