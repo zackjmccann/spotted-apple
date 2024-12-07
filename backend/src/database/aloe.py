@@ -35,6 +35,18 @@ class Aloe(Postgres):
             return_method='fetchone',
             cursor_type='RealDictCursor')
 
+    def get_user_email(self, email) -> dict:
+        query_data = {
+            'text': f'SELECT email '
+                    f'FROM users WHERE email = %(email)s;',
+            'values': {'email': email}
+        }
+
+        return self.execute_query(
+            query_data=query_data,
+            return_method='fetchone',
+            cursor_type='RealDictCursor')
+
     def insert_user(self, user_data: dict) -> int:
         query_data = {
             'text': f'INSERT INTO users (email, first_name, last_name) '

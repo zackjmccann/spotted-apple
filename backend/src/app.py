@@ -3,6 +3,7 @@ from flask import Flask, jsonify
 from database.aloe import init_app
 from middleware import Authenticator, routes
 from users.routes import users_blueprint
+from api.routes import api_blueprint
 from spotted_apple_logging import logger
 
 
@@ -34,6 +35,7 @@ def create_app(test_config=None):
     init_app(app)
     app.wsgi_app = Authenticator(app.wsgi_app)
     app.register_blueprint(routes.auth_blueprint, url_prefix='/auth')
+    app.register_blueprint(api_blueprint, url_prefix='/api')
     app.register_blueprint(users_blueprint, url_prefix='/users')
 
     return app
