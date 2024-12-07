@@ -1,16 +1,19 @@
 'use client';
 
 import { useActionState } from 'react'
+import { SignUpState, SignUpProps, FormAction} from '@/app/features/sign-up-feature/types'
 import { createAccount } from '@/app/features/create-account-form-feature/actions';
 import { setPassword } from '@/app/features/create-set-password-form-feature/actions';
-import { SignUpState} from '@/app/features/sign-up-feature/types'
 
-export default function signUp(state: SignUpState) {
+export default function signUp(state: SignUpState): SignUpProps {
+    let formState: SignUpState;
+    let formAction: FormAction;
+
     if (!state.created) {
-        const [formState, formAction] = useActionState(createAccount, state);
-        return [formState, formAction]
+        [formState, formAction] = useActionState(createAccount, state);
     } else {
-        const [formState, formAction] = useActionState(setPassword, state);
-        return [formState, formAction]
+        [formState, formAction] = useActionState(setPassword, state);
     }
+
+    return {state: formState, formAction: formAction}
 };

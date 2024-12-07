@@ -4,8 +4,10 @@ export type SignUpState = {
     errors?: Record<string, string[]>;
     formData?: Record<string, string>;
   }
-  
+
+export type FormAction = (payload: FormData) => void;
+
 export type SignUpProps = {
   state: SignUpState;
-  formAction: string | ((formData: FormData) => void | Promise<void>) | undefined;
+  formAction: FormAction;
 }
