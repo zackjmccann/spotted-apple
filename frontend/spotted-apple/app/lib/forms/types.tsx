@@ -14,12 +14,6 @@ export type ButtonDisplay = {
     pendingDisplay: string;
 }
 
-export type CreateAccountState = {
-    created: boolean;
-    errors?: Record<string, string[]>;
-    formData?: Record<string, string | File>;
-}
-
 export type InputFieldsErrors = {
     errors: string[];
 }
