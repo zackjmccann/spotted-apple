@@ -1,14 +1,13 @@
-"use client";
-
 import { useRef, useEffect, useState } from 'react';
 
-type CustomFunctionalComponentProps = {
+
+export type CustomFunctionalComponentProps = {
     id: string;
     name: string | undefined;
 
 }
 
-function CustomFunctionalComponent(props: CustomFunctionalComponentProps) {
+export function CustomFunctionalComponent(props: CustomFunctionalComponentProps) {
     const [state, setState] = useState(0)
     const id: string = props.id
     const name: string | undefined = props.name
@@ -44,19 +43,4 @@ function CustomFunctionalComponent(props: CustomFunctionalComponentProps) {
             <button ref={clickButton} onClick={() => setState(state + 1)}>Click</button>
         </div>
     )
-};
-
-export default function Page() {
-    const customProps: CustomFunctionalComponentProps = {id: 'customId', name: 'Custom Component'}
-    return (
-        <main className="flex min-h-screen flex-col items-center p-12">
-            <div className="flex flex-col items-center">
-                <h1 className="mb-3 text-6xl font-semibold"> Spotted Apple Test Page </h1>
-            </div>
-            <CustomFunctionalComponent
-                id={customProps.id}
-                name={customProps.name}
-            />
-    </main>
-  );
 };

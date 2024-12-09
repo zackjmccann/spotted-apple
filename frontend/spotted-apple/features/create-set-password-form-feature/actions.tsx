@@ -1,7 +1,7 @@
 "use client";
 
-import { SetPasswordFormSchema } from '@/app/features/create-set-password-form-feature/schemas'
-import { SignUpState } from '@/app/features/sign-up-feature/types'
+import { SetPasswordFormSchema } from '@/features/create-set-password-form-feature/schemas'
+import { SignUpState } from '@/features/sign-up-feature/types'
 
 function validateFields(formData: FormData) {
     return SetPasswordFormSchema.safeParse({

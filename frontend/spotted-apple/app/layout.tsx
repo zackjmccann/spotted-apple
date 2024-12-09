@@ -1,4 +1,4 @@
-import '@/app/lib/globals.css';
+import '@/app/lib/styles/globals.css';
 import { inter } from "@/app/lib/fonts";
 import type { Metadata } from "next";
 
@@ -7,11 +7,7 @@ export const metadata: Metadata = {
   description: "Share playlist with everybody",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children, }: Readonly<{ children: React.ReactNode; }>) {
   return (
     <html lang="en">
       <body className={inter.className}>{children}</body>

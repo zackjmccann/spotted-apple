@@ -1,11 +1,11 @@
 'use client';
 
-import { SignUpState} from '@/app/features/sign-up-feature/types';
-import { SignUpProps } from '@/app/features/sign-up-feature/types';
-import signUp from '@/app/features/sign-up-feature/actions';
+import { SignUpState} from '@/features/sign-up-feature/types';
+import { SignUpProps } from '@/features/sign-up-feature/types';
+import signUp from '@/features/sign-up-feature/actions';
 
-import CreateAccountForm from '@/app/features/create-account-form-feature/form';
-import SetPasswordForm from '@/app/features/create-set-password-form-feature/form'
+import CreateAccountForm from '@/features/create-account-form-feature/form';
+import SetPasswordForm from '@/features/create-set-password-form-feature/form'
 
 const Banner = () => {
   return (

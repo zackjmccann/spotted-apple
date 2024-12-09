@@ -3,13 +3,15 @@
 import { ChangeEvent, useState, } from 'react'
 import { FormField, FormFieldError, SubmitButton } from '@/app/lib/forms/components'
 import { ButtonDisplay, InputFields, InputFieldErrorState} from '@/app/lib/forms/types'
-import { CreateAccountFormProps } from '@/app/features/create-account-form-feature/types';
+import { SetPasswordFormProps } from '@/features/create-set-password-form-feature/types';
 
-export default function CreateAccountForm({state, formAction}: CreateAccountFormProps) {
-    const initialErrorState: InputFieldErrorState = {email: true, firstName: true, lastName: true};
+
+export default function SetPasswordForm({state, formAction}: SetPasswordFormProps) {
+    // TODO: Display one error message at the bottom, not per field
+    const initialErrorState: InputFieldErrorState = {email: true, password: true, confirmPassword: true};
     const [intputState, setInput] = useState(state.formData);
     const [errorState, displayError] = useState(initialErrorState) 
-    
+
     const onSubmit = () => { displayError(initialErrorState) }
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -35,27 +37,22 @@ export default function CreateAccountForm({state, formAction}: CreateAccountForm
     const fields: InputFields = [
         {
             id: 'email',
-            placeHolder: 'example@email.com',
             initialValue: intputState && intputState.email ? intputState.email : "",
             onChange: onChange,
         },
         {
-            id: 'firstName',
-            placeHolder: 'First Name',
-            initialValue: intputState && intputState.firstName ? intputState.firstName : "",
+            id: 'password',
             onChange: onChange
         },
         {
-            id: 'lastName',
-            placeHolder: 'Last Name',
-            initialValue: intputState && intputState.lastName ? intputState.lastName : "",
+            id: 'confirmPassword',
             onChange: onChange
         },
     ]
 
-    const formId = 'createAccount';
-    const formHeader = 'Create an account with Spotted Apple';
-    const buttonValues: ButtonDisplay = {staticDisplay: 'Create Account', pendingDisplay: 'creating account...'}
+    const formId = 'setPassword';
+    const formHeader = 'Set a password for your account';
+    const buttonValues: ButtonDisplay = {staticDisplay: 'Set Password', pendingDisplay: 'setting password...'}
 
     return (
         <form id={formId} className={formId} action={formAction} onSubmit={onSubmit}>
@@ -71,7 +68,7 @@ export default function CreateAccountForm({state, formAction}: CreateAccountForm
                 </div>
                 ))}
             </ul>
-            <SubmitButton key='createAccountSubmitButton' {...buttonValues}/>
+            <SubmitButton key='setPasswordSubmitButton' {...buttonValues}/>
         </form>
     )
 };

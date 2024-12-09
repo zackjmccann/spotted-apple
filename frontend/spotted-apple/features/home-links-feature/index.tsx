@@ -1,7 +1,5 @@
-'use client';
-
 import Link from 'next/link';
-import { CustomLink } from '@/app/features/home-links-feature/schema'
+import { CustomLink } from '@/features/home-links-feature/schema'
 
 const createAccount: CustomLink = {
     name: 'Create Account',
