@@ -1,4 +1,4 @@
-import { RequestParameters } from "@/app/data-access/types";
+import { RequestParameters } from "@/data-access/types";
 
 export class Aloe {
     origin: string;

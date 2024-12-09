@@ -1,5 +1,5 @@
-import { Aloe } from '@/app/data-access/aloe'
-import { RequestParameters } from "@/app/data-access/types";
+import { Aloe } from '@/data-access/aloe'
+import { RequestParameters } from "@/data-access/types";
 
 
 export async function checkIfEmailExists(email: string): Promise<boolean | null> {
