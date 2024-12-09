@@ -1,4 +1,4 @@
-import { Aloe } from '../app/data-access/aloe'
+import { Aloe } from '../data-access/aloe'
 import { expect, describe, it } from 'vitest'
 
 let db = new Aloe()

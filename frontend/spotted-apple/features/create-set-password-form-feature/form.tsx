@@ -1,8 +1,8 @@
 'use client';
 
 import { ChangeEvent, useState, } from 'react'
-import { FormField, FormFieldError, SubmitButton } from '@/app/lib/forms/components'
-import { ButtonDisplay, InputFields, InputFieldErrorState} from '@/app/lib/forms/types'
+import { FormField, FormFieldError, SubmitButton } from '@/lib/forms/components'
+import { ButtonDisplay, InputFields, InputFieldErrorState} from '@/lib/forms/types'
 import { SetPasswordFormProps } from '@/features/create-set-password-form-feature/types';
 
 
