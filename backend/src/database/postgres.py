@@ -16,7 +16,7 @@ class Postgres:
         self.service = f'{self.service_host}:{self.service_port}'
         self.connection_string = self._get_connection_string()
 
-    def get_connection(self):
+    def connect(self):
         return psycopg2.connect(dsn=self.connection_string)
 
     def _get_connection_string(self):
@@ -28,7 +28,7 @@ class Postgres:
         pass
 
     def execute_query(self, query_data: dict, return_method: str, cursor_type: str = None):
-        with self.get_connection() as conn:
+        with self.connect() as conn:
             if cursor_type:
                 cursor = conn.cursor(cursor_factory=getattr(extras, cursor_type))
             else:

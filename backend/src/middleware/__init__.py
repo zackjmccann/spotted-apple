@@ -1,7 +1,5 @@
-from src.middleware.auth import Authenticator
-from src.middleware import routes
+from src.middleware.authenticator import Authenticator
 
 __all__ = [
     'Authenticator',
-    'routes',
 ]

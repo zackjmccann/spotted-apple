@@ -1,22 +1,7 @@
 """
 A class representing an instance of the Spotted Apple Database "Aloe"
 """
-from flask import g
 from src.database.postgres import Postgres
-
-
-def connect():
-    if 'aloe' not in g:
-        aloe = Aloe()
-    return aloe.get_connection()
-
-def close(e=None):
-    aloe = g.pop('aloe', None)
-    if aloe is not None:
-        aloe.close_connections()
-
-def init_app(app):
-    app.teardown_appcontext(close)
 
 
 class Aloe(Postgres):
@@ -42,10 +27,15 @@ class Aloe(Postgres):
             'values': {'email': email}
         }
 
-        return self.execute_query(
+        result = self.execute_query(
             query_data=query_data,
             return_method='fetchone',
             cursor_type='RealDictCursor')
+        
+        if not result:
+            return {}
+        
+        return result
 
     def insert_user(self, user_data: dict) -> int:
         query_data = {

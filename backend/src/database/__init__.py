@@ -1,7 +1,7 @@
 from src.database.aloe import Aloe
-from src.database.postgres import Postgres
+
+aloe = Aloe()
 
 __all__ = [
-    'Aloe',
-    'Postgres'
+    'aloe',
 ]
