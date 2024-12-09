@@ -1,4 +1,4 @@
-from src.database.postgres import Postgres
+from app.database.postgres import Postgres
 
 
 def test_value(value):
