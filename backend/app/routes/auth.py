@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, make_response
 from services.auth import authenticate, validate_token, issue_token
 from werkzeug.exceptions import UnsupportedMediaType
 
@@ -26,25 +26,38 @@ def get_token():
             return {
                 'code': response['code'],
                 'data': {
+                    'ok': False,
                     'status': response['status'],
                     'message': response['message'],
             }
         }
     
         token = issue_token(data.get('username'), data.get('id'))
-
-        return {
+        response_data = {
             'code': 200,
             'data': {
+                'ok': True,
                 'status': 'Access Granted',
                 'token': token,
                 }
             }
+        
+        response = make_response(response_data)
+        response.set_cookie(
+            'token',
+            token,
+            httponly=True,
+            secure=False,  # Use True when app is using HTTPS
+            samesite='Strict',
+            max_age=24 * 60 * 60  # Token valid for 1 day
+        )
+        return response
 
     except (TypeError, KeyError):
         return {
             'code': 400,
             'data': {
+                'ok': False,
                 'status': 'Failed',
                 'message': 'Unable to process authorization request',
             }
@@ -60,18 +73,20 @@ def introspect_token():
             return {
                 'code': response['code'],
                 'data': {
+                    'ok': False,
                     'status': response['status'],
                     'message': response['message'],
                     }
             }
 
         else:
-            return {'code': 201, 'data': {'valid': True}}
+            return {'code': 200, 'data': {'ok': True, 'valid': True}}
 
     except (TypeError, AttributeError):
         return {
             'code': 400,
             'data': {
+                'ok': False,
                 'status': 'Failed',
                 'message': 'Unable to process authorization request'
                 },

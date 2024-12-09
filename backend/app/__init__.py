@@ -27,7 +27,6 @@ def create_app(config='config.settings'):
     app.wsgi_app = Authenticator(app.wsgi_app)
 
     for blueprint in blueprints:
-
         DEFAULT_CORS_CONFIG = {
              r'/*': {
                  'methods': ['GET', 'POST', 'OPTIONS'],

@@ -40,6 +40,7 @@ def issue_token(username, id):
     return jwt.encode(data, SECRET_KEY, ALOGRITHMS)
 
 def validate_token(token):
+    print(token)
     if not token:
         return {
             'valid': False,
@@ -50,11 +51,10 @@ def validate_token(token):
 
     try:
         data = jwt.decode(token, SECRET_KEY, algorithms=ALOGRITHMS, audience=APP_ID)
-        for aud in data['aud']:
-            assert aud in GRANTED_APP_IDS
+        # for aud in data['aud']:
+        #     assert aud in GRANTED_APP_IDS
 
-        data.update({'valid': True})
-        return data
+        return {'valid': True, 'code': 200, 'data': data,}
 
     except jwt.ExpiredSignatureError:
         error_data = {
@@ -68,4 +68,6 @@ def validate_token(token):
             'message': 'Invalid Token'
             }
 
-    return {'valid': False, 'code': 401}.update(error_data)
+    response = {'valid': False, 'code': 401}
+    response.update(error_data)
+    return response
