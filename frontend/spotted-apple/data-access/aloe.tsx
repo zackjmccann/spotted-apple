@@ -1,4 +1,5 @@
 import { RequestParameters } from "@/data-access/types";
+// import { parse } from 'cookie';
 
 export class Aloe {
     origin: string;
@@ -18,10 +19,6 @@ export class Aloe {
         this.appId = parseInt(process.env.NEXT_PUBLIC_APP_ID!)        
     };
 
-    async getClient(){
-        this.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzcG90dGVkLWFwcGxlLWJhY2tlbmQiLCJhdWQiOlsiMSJdLCJpYXQiOjE3MzM3MjA2MDAsImV4cCI6MTczMzcyMDkwMCwianRpIjoiYmFja2VuZF9zZXJ2aWNlc18yMDI0MTIwOV8wMDAzIiwiY29udGV4dCI6eyJ1c2VybmFtZSI6ImZyb250ZW5kIiwicm9sZXMiOlsiY2xpZW50Il19fQ.kVIGpJri7vHHDYRacZcWRYLnscxbP8eo0smt8Co5zms"
-        return {'Authorization': `Bearer ${this.token}`};
-    }
     async sendRequest(params: RequestParameters): Promise<Response> {
         const query = new URLSearchParams(params.queryParameters).toString();
         const url = `${this.backendServer}${params.endpoint}${query ? `?${query}` : ''}`
@@ -44,4 +41,47 @@ export class Aloe {
         const response = await fetch(url, options);
         return await response;        
     };
+
+    async getClient() {
+        if(!this.token) {
+            console.log(`HERE`)
+            this.authenticate()
+        }
+        console.log(`TOKEN: ${this.token}`)
+        return {'Authorization': `Bearer ${this.token}`};
+    }
+
+    async authenticate() {
+        console.log('authenticating...')
+        const requestParams: RequestParameters = {
+            method: 'POST',
+            endpoint: '/auth/token',
+            body: {
+                username: this.username,
+                password: this.password,
+                id: this.appId.toString(),
+                grant_type: 'client_credentials',
+            },
+        }
+
+        let token: string | null = null
+
+        try {
+            const response = await this.sendRequest(requestParams);    
+            if (!response.ok) {
+                const data = await response.json()
+                throw new Error(`${data.message}`)
+            } else {
+                console.log(`response: ${response}`)
+                const data = await response.json()
+                console.log(`data: ${data}`)
+                token = data.token
+            }
+        } catch (error) {
+            const err = error instanceof Error ? error.message : String(error)
+            console.log(`Request Failed: ${err}`);
+        }
+
+        this.token = token
+    }
 };

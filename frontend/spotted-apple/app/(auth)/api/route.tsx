@@ -4,7 +4,7 @@ import { RequestParameters } from "@/data-access/types";
 
 export async function checkIfEmailExists(email: string): Promise<boolean | null> {
     let aloe = new Aloe()
-    
+    console.log(`Checking email with token: ${aloe.token}`)
     const requestParams: RequestParameters = {
         method: 'POST',
         endpoint: '/api/check-email',
