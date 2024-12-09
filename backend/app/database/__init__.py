@@ -1,4 +1,4 @@
-from src.database.aloe import Aloe
+from app.database.aloe import Aloe
 
 aloe = Aloe()
 

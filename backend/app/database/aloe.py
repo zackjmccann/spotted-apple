@@ -1,7 +1,7 @@
 """
 A class representing an instance of the Spotted Apple Database "Aloe"
 """
-from src.database.postgres import Postgres
+from app.database.postgres import Postgres
 
 
 class Aloe(Postgres):

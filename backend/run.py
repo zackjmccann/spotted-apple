@@ -1,5 +1,5 @@
 import os
-from src import create_app
+from app import create_app
 from distutils.util import strtobool
 
 

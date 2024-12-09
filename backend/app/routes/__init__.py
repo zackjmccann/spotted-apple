@@ -1,7 +1,7 @@
-from src.routes.api import api, api_cors_config
-from src.routes.auth import auth
-from src.routes.test import test_bp
-from src.routes.user import user
+from app.routes.api import api, api_cors_config
+from app.routes.auth import auth
+from app.routes.test import test_bp
+from app.routes.user import user
 
 blueprints = [
     {'blueprint': api, 'url_prefix': '/api', 'cors_config': api_cors_config},
