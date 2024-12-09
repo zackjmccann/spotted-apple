@@ -2,7 +2,7 @@ FROM python:3.12.4-bookworm
 
 ARG UID=1000
 ARG GID=1000
-ENV HOME=/db
+ENV HOME=/server
 ENV PORT=8000
 
 WORKDIR ${HOME}
@@ -28,10 +28,10 @@ ENV FLASK_DEBUG="${FLASK_DEBUG}" \
     FLASK_APP="src.app" \
     FLASK_SKIP_DOTENV="true" \
     PYTHONUNBUFFERED="true" \
-    PYTHONPATH=${HOME}:${HOME}/src:/src \
+    PYTHONPATH=${HOME}:${HOME}/app:/app \
     PATH=/${HOME}/.local/bin:${PATH} \
     USER="spotted"
 
 EXPOSE ${PORT}
 
-CMD [ "gunicorn", "-c", "./config/gunicorn.py", "src.app:create_app()" ]
+CMD [ "gunicorn", "-c", "./config/gunicorn.py", "run:app"]

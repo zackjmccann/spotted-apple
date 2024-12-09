@@ -1,4 +1,4 @@
-import HomeLinks from '@/app/features/home-links-feature/components'
+import HomeLinks from '@/features/home-links-feature'
 
 export default function Home() {
   return (
