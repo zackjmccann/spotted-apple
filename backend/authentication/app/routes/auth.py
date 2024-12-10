@@ -1,5 +1,5 @@
 from flask import Blueprint, request, make_response
-from services.auth import authenticate, validate_token, issue_token
+from services.auth import authenticate, validate_token, issue_token, set_cookies
 
 auth = Blueprint('auth', __name__)
 
@@ -31,25 +31,24 @@ def get_token():
             }
         }
     
-        token = issue_token(data.get('username'), data.get('id'))
+        access_token = issue_token(data.get('username'), data.get('id'), 10)
+        refresh_token = issue_token(data.get('username'), data.get('id'), 10080) # 7 days
         response_data = {
             'code': 200,
             'data': {
                 'ok': True,
                 'status': 'Access Granted',
-                'token': token,
+                'access_token': access_token,
+                'refresh': refresh_token,
                 }
             }
-        
+
         response = make_response(response_data)
-        response.set_cookie(
-            'token',
-            token,
-            httponly=True,
-            secure=False,  # Use True when app is using HTTPS
-            samesite='Strict',
-            max_age=24 * 60 * 60  # Token valid for 1 day
-        )
+        set_cookies(response, [
+            {'type': 'access_token', 'token': access_token},
+            {'type': 'refresh_token', 'token': refresh_token},
+            ])
+
         return response
 
     except (TypeError, KeyError):
