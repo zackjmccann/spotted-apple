@@ -1,12 +1,28 @@
 name: backend
 services:
-  backend_server:
-    build: .
-    image: zackjmccann/backend-server-dev:0.0.1-dev
-    # image: us-east1-docker.pkg.dev/spotted-apple/backend/client-test:0.0.1-dev
-    container_name: backend-server-dev
+  auth:
+    image: zackjmccann/auth-service:0.0.1-dev
+    build:
+      dockerfile: ./authentication/Dockerfile
+    container_name: auth-service
     env_file:
-      - '.env'
+      - './authentication/.env'
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    deploy:
+      resources:
+        limits:
+          cpus: "${DOCKER_WEB_CPUS:-0}"
+          memory: "${DOCKER_WEB_MEMORY:-0}"
+    ports:
+      - "8080:8080"
+
+  ops:
+    image: zackjmccann/ops-service:0.0.1-dev
+    build:
+      dockerfile: ./operations/Dockerfile
+    container_name: ops-service
+    env_file:
+      - './operations/.env'
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     deploy:
       resources:
@@ -20,7 +36,7 @@ services:
     image: postgres:16.6-bullseye
     container_name: local-pg
     env_file:
-      - '.env'
+      - './operations/.env'
     volumes:
       - local_pg_data:/var/lib/postgresql/data
     ports:
