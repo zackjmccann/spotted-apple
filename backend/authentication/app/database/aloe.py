@@ -13,7 +13,7 @@ class Aloe(Postgres):
     def get_user(self, id) -> dict:
         query_data = {
             'text': f'SELECT id, created, email, first_name, last_name '
-                    f'FROM users WHERE id = %(id)s;',
+                    f'FROM account_access_info WHERE id = %(id)s;',
             'values': {'id': id}
         }
 
@@ -25,7 +25,7 @@ class Aloe(Postgres):
     def get_user_email(self, email) -> dict:
         query_data = {
             'text': f'SELECT email '
-                    f'FROM users WHERE email = %(email)s;',
+                    f'FROM account_access_info WHERE email = %(email)s;',
             'values': {'email': email}
         }
 
@@ -59,8 +59,8 @@ class Aloe(Postgres):
 
     def delete_user(self, id: int) -> int:
         query_data = {
-            'text': f'DELETE FROM users WHERE id = %(id)s '
-                    f'RETURNING users.id;',
+            'text': f'DELETE FROM account_access_info WHERE id = %(id)s '
+                    f'RETURNING account_access_info.id;',
             'values': {'id': id}
             }
 
