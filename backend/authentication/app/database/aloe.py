@@ -1,7 +1,9 @@
 """
 A class representing an instance of the Spotted Apple Database "Aloe"
 """
+from auth_logging import logger
 from app.database.postgres import Postgres
+from psycopg2 import errors
 
 
 class Aloe(Postgres):
@@ -37,17 +39,23 @@ class Aloe(Postgres):
         
         return result
 
-    def insert_user(self, user_data: dict) -> int:
+    def register_account(self, email: str, password_hash: str, password_salt: str):
         query_data = {
-            'text': f'INSERT INTO users (email, first_name, last_name) '
-                    f'VALUES (%(email)s, %(first_name)s, %(last_name)s) RETURNING users.id, users.created;',
-            'values': user_data
+            'text': 'SELECT email, id, created FROM register_account(%(email)s, %(password_hash)s, %(password_salt)s);',
+            'values': {
+                'email': email,
+                'password_hash': password_hash,
+                'password_salt': password_salt
+            }
         }
 
-        return self.execute_query(
-            query_data=query_data,
-            return_method='fetchone',
-            cursor_type='RealDictCursor')
+        results = self.execute_query(query_data=query_data, return_method='fetchone', cursor_type='RealDictCursor')
+        try:
+            assert type(results) != errors.UniqueViolation
+            return results
+        except AssertionError:
+            logger.critical('Failed to insert new account info')
+            return {'email': None, 'id': -1, 'created': None}
 
     def delete_user(self, id: int) -> int:
         query_data = {

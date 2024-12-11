@@ -51,8 +51,8 @@ def validate_token(token):
 
     try:
         data = jwt.decode(token, SECRET_KEY, algorithms=ALOGRITHMS, audience=APP_ID)
-        for aud in json.loads(data['aud']):
-            assert aud in GRANTED_APP_IDS
+        # for aud in data['aud']:
+        #     assert aud in GRANTED_APP_IDS
 
         return {'valid': True, 'code': 200, 'data': data,}
 

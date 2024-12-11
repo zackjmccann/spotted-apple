@@ -65,7 +65,7 @@ def get_token():
 def introspect_token():
     try:
         data = request.get_json()
-        response = validate_token(data.get('token', None))
+        response = validate_token(data.get('access_token', None))
 
         if not response['valid']:
             return {

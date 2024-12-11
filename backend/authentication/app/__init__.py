@@ -7,6 +7,7 @@ from middleware import Authenticator
 from utilities import BackendResponse
 from auth_logging import logger
 
+
 def create_app(config='config.settings'):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(config)
