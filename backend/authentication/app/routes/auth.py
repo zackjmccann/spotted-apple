@@ -70,7 +70,7 @@ def introspect_token():
             }
 
         else:
-            return {'code': 200, 'data': {'ok': True, 'valid': True}}
+            return {'code': 200, 'data': {'valid': True}}
 
     except (TypeError, AttributeError):
         return {
