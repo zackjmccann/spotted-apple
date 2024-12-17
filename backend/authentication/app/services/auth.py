@@ -1,8 +1,10 @@
 import os
 import jwt
-import json
 import datetime
 from distutils.util import strtobool
+from models.credentials import credentials_payload_schema
+from utilities.payload_handlers import sanitize
+from jsonschema import ValidationError
 from database import aloe
 
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -16,17 +18,28 @@ class AuthenticationError(Exception):
 if None in [SECRET_KEY, ALOGRITHMS, APP_ID]:
     raise AuthenticationError('An authentication failure occurred')
 
-def authenticate(credentials):
-    response = aloe.authenticate_client(credentials)
+def authenticate(payload):
+    try:
+        playload_mapping = {'username': 'str', 'password': 'str', 'id': 'int', 'grant_type': 'str'}
+        clean_payload = sanitize(payload, credentials_payload_schema, playload_mapping)
+        response = aloe.authenticate_client(clean_payload)
+        clean_payload.update(response)
 
-    if not response['valid']:
-        response.update({
+        if not response['valid']:
+            response.update({
+                'code': 401,
+                'status': 'Authentication Failed',
+                'message': 'Unable to authenticate',
+            })
+
+        return clean_payload
+    except (ValidationError, ValueError, KeyError):
+        return {
             'code': 401,
+            'valid': False,
             'status': 'Authentication Failed',
             'message': 'Unable to authenticate',
-        })
-
-    return response
+            }
 
 def issue_token(username, id, exp=5):
     data = {
@@ -37,7 +50,6 @@ def issue_token(username, id, exp=5):
         'jti': 'backend_services' + '_' + datetime.datetime.now().strftime('%Y%m%d_%H%M'),
         'context': {'username': username, 'roles':['client']}
         }
-
     return jwt.encode(data, SECRET_KEY, ALOGRITHMS)
 
 def validate_token(token):
@@ -50,11 +62,18 @@ def validate_token(token):
         }
 
     try:
-        data = jwt.decode(token, SECRET_KEY, algorithms=ALOGRITHMS, audience=APP_ID)
+        assert not is_blacklisted_token(token)
+        data = jwt.decode(token, SECRET_KEY, algorithms=[ALOGRITHMS], audience=APP_ID)
         # for aud in data['aud']:
         #     assert aud in GRANTED_APP_IDS
 
         return {'valid': True, 'code': 200, 'data': data,}
+
+    except AssertionError:
+        error_data = {
+            'status': 'Authentication Failed',
+            'message': 'Token Blacklisted'
+            }
 
     except jwt.ExpiredSignatureError:
         error_data = {
@@ -97,3 +116,26 @@ def set_cookies(response, tokens: list):
         )
 
     return response
+
+def is_blacklisted_token(token):
+    response = aloe.check_token_blacklist(token)
+    return response['token_is_blacklisted']
+
+def blacklist_token(token):
+    response = aloe.blacklist_token(token)
+
+    if response['id'] is None:
+        response.update({
+            'code': 401,
+            'status': 'Authentication Failed',
+            'message': 'Unable to authenticate',
+        })
+    
+    return {
+        'code': 200,
+        'status': 'Success',
+        'message': 'Token blacklisted',
+        }
+
+def parse_token(token):
+    return jwt.decode(token, SECRET_KEY, algorithms=[ALOGRITHMS], audience=APP_ID)
