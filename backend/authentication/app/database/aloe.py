@@ -71,25 +71,46 @@ class Aloe(Postgres):
 
     def authenticate_client(self, client_credentials):
         query_data = {
-            'text': f'SELECT TRUE     AS valid, '
-                    f'       username AS username, '
-                    f'       id       AS id '
-                    f'FROM clients '
-                    f'WHERE username = %(username)s '
-                    f'AND password = %(password)s '
-                    f'AND id = %(id)s;',
+            'text': 'SELECT authenticate_client(%(username)s, %(password)s, %(id)s) AS valid; ',
             'values': {
                 'username': client_credentials['username'],
                 'password': client_credentials['password'],
                 'id': client_credentials['id'],
                 }
         }
-        result = self.execute_query(
+        return self.execute_query(
             query_data=query_data,
             return_method='fetchone',
             cursor_type='RealDictCursor')
 
-        if result is None:
-            result = {'valid': False}
+    def blacklist_token(self, token):
+        query_data = {
+            'text': 'SELECT id FROM blacklist_token(%(token)s);',
+            'values': { 'token': token }
+        }
+        results = self.execute_query(
+            query_data=query_data,
+            return_method='fetchone',
+            cursor_type='RealDictCursor')
 
-        return result
+        try:
+            assert type(results) != errors.UniqueViolation
+            return results
+        except AssertionError:
+            raise KeyError('Failed to blacklist token')
+
+    def check_token_blacklist(self, token):
+        query_data = {
+            'text': 'SELECT check_if_token_is_blacklisted(%(token)s) AS token_is_blacklisted;',
+            'values': { 'token': token }
+        }
+        results = self.execute_query(
+            query_data=query_data,
+            return_method='fetchone',
+            cursor_type='RealDictCursor')
+
+        try:
+            assert type(results) != errors.UniqueViolation
+            return results
+        except AssertionError:
+            raise KeyError('Failed to blacklist token')
