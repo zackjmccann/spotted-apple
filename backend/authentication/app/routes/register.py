@@ -1,5 +1,5 @@
 from flask import Blueprint, request, make_response
-from services.register import register_account
+from services.register import register_account, check_if_acccount_is_registered
 
 register = Blueprint('register', __name__)
 
@@ -24,6 +24,28 @@ def account():
                     'notice': 'Registration was unsuccessful',
                     },
                 }
+
+    except (TypeError, KeyError):
+        return {
+            'code': 400,
+            'data': {
+                'status': 'Failed',
+                'message': 'Account registration failed',
+            }
+        }
+
+@register.route('/introspect', methods=["POST"])
+def introspect():
+    try:
+        data = request.get_json()
+        id_registered = check_if_acccount_is_registered(data)
+        return {
+            'code': 200,
+            'data': {
+                'status': 'Success',
+                'registered': id_registered,
+                },
+            }
 
     except (TypeError, KeyError):
         return {

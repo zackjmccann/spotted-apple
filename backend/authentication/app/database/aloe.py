@@ -29,15 +29,10 @@ class Aloe(Postgres):
             'values': {'email': email}
         }
 
-        result = self.execute_query(
+        return self.execute_query(
             query_data=query_data,
             return_method='fetchone',
             cursor_type='RealDictCursor')
-        
-        if not result:
-            return {}
-        
-        return result
 
     def register_account(self, email: str, password_hash: str, password_salt: str):
         query_data = {
