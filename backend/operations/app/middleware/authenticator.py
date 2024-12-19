@@ -1,6 +1,6 @@
-from services.auth import authenticate_with_auth_server
-from utilities import BackendResponse
 from werkzeug.wrappers import Request
+from utilities import BackendResponse
+from services.auth import authenticate_with_auth_server
 
 
 class Authenticator:
