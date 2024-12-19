@@ -17,20 +17,3 @@ def find_user(id: int) -> User:
         return None
 
     return User(query_response)
-
-def create_user(user_data: dict) -> User:
-    user = User(user_data)
-
-    if not user.is_valid:
-        user = None
-    
-    query_response = aloe.insert_user(user_data=user.info)
-    user.add_fields(query_response)
-
-    return user
-
-def delete_user(id: int) -> int:
-    query_response = aloe.delete_user(user_data=id)
-    if query_response is None:
-        return None
-    return query_response['id']
