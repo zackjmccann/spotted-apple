@@ -1,0 +1,1 @@
+# Spotted Apple Authentication Service

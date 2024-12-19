@@ -9,7 +9,7 @@ def get_log_level():
     else:
         return logging.INFO
 
-logger = logging.getLogger('sa_logger')
+logger = logging.getLogger('ops_logger')
 
 
 logging.basicConfig(

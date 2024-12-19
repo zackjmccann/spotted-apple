@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from services.auth import AuthenticationError
 from services.api import email_is_registered
 from werkzeug.exceptions import UnsupportedMediaType
 
@@ -17,27 +18,33 @@ api_cors_config = {
 def check_email():
     try:
         # UnsupportedMediaType is raised if request content type is not 'application/json'
-        if request.method == 'POST':
-            data = request.get_json()
-            email = data.get('email', None)
-            assert email is not None
-        else:
-            return { 'code': 200, 'data': {} }
+        print(f'Req Auth 2: {str(request.authorization)[-10:]}')
+        data = request.get_json()
+        email = data.get('email', None)
+        assert email is not None
 
     except (UnsupportedMediaType, AssertionError):
         return {
             'code': 400,
             'data': {
-                'ok': False,
                 'status': 'failed',
                 'message': 'Bad request: did not contain an email or not json content type',
             }
         }
 
-    return {
-        'code': 200,
-        'data': {
-            'ok': True,
-            'registered': email_is_registered(email), 
+    try:
+        is_registered = email_is_registered(email, request.headers)
+        code = 200
+        data = {
+            'status': 'success',
+            'registered': is_registered,
             }
-        }
+
+    except AuthenticationError as err:
+        code = err.code
+        data = {
+            'status': err.status,
+            'message': str(err),
+            }
+
+    return {'code': code, 'data': data}
