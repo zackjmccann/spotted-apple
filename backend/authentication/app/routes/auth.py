@@ -88,7 +88,6 @@ def refresh_token():
         refresh_token = str(data.get('refresh_token', None))
         assert not is_blacklisted_token(refresh_token)
         response = validate_token(refresh_token)
-
         if not response['valid']:
             return {
                 'code': response['code'],
@@ -101,7 +100,7 @@ def refresh_token():
         else:
             refresh_token_response = blacklist_token(refresh_token)
             assert refresh_token_response['code'] == 200
-            
+
             refresh_token_data = parse_token(refresh_token)    
             username = refresh_token_data['context']['username']
             id = refresh_token_data['aud'][0]
@@ -137,35 +136,25 @@ def refresh_token():
 def revoke_token():
     try:
         data = request.get_json()
-        access_token = str(data.get('access_token', None))
-        refresh_token = str(data.get('refresh_token', None))
-        accesss_token_response = validate_token(access_token)
-        refresh_token_response = validate_token(refresh_token)
-
-        for response in [accesss_token_response, refresh_token_response]:
-            if not response['valid']:
-                return {
-                    'code': response['code'],
-                    'data': {
-                        'status': response['status'],
-                        'message': response['message'],
-                        }
-                }
-
-        else:
-            access_token_response = blacklist_token(access_token)
-            refresh_token_response = blacklist_token(refresh_token)
-
-            assert access_token_response['code'] == 200
-            assert refresh_token_response['code'] == 200
-
+        token = str(data.get('token', None))
+        response = validate_token(token)
+        if not response['valid']:
             return {
-                'code': 200,
-                'data': { 
-                    'status': 'Success',
-                    'message': 'Tokens blacklisted'
-                }
+                'code': response['code'],
+                'data': {
+                    'status': response['status'],
+                    'message': response['message'],
+                    }
             }
+        blacklist_response = blacklist_token(token)
+        assert blacklist_response['code'] == 200
+        return {
+            'code': 200,
+            'data': { 
+                'status': 'Success',
+                'message': 'Token blacklisted'
+            }
+        }
 
     except (TypeError, AttributeError, AssertionError):
         return {
