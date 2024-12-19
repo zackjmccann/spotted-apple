@@ -1,4 +1,4 @@
-from flask import Blueprint, request, make_response
+from flask import Blueprint, request
 from services.register import register_account, check_if_acccount_is_registered
 
 register = Blueprint('register', __name__)
@@ -38,12 +38,12 @@ def account():
 def introspect():
     try:
         data = request.get_json()
-        id_registered = check_if_acccount_is_registered(data)
+        is_registered = check_if_acccount_is_registered(data)
         return {
             'code': 200,
             'data': {
                 'status': 'Success',
-                'registered': id_registered,
+                'registered': is_registered,
                 },
             }
 
