@@ -5,3 +5,12 @@ export type RequestParameters = {
     body?: Record<string, string>;
     headers?: Record<string, string>;
 }
+
+
+export type AuthCredentials = {
+    origin: string;
+    authServer: string;
+    username: string;
+    password: string;
+    appId: number;
+}
