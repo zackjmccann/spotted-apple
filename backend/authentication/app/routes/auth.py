@@ -11,7 +11,7 @@ from services.auth import (
 
 auth = Blueprint('auth', __name__)
 
-@auth.route('/token', methods=["POST"])
+@auth.route('/token', methods=['POST'])
 def get_token():
     try:
         data = request.get_json()

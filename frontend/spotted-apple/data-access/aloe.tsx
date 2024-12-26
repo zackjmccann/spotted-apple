@@ -43,6 +43,10 @@ export class Aloe {
     };
 
     async getClient() {
+        // 1. Check cookies for access_token
+        //  a. If no access_token, check for refresh_token
+        //  b. If no access or refresh tokens, request one from the Auth Server
+        // 2. From access_token in cookie, construct the client
         if(!this.token) {
             console.log(`HERE`)
             this.authenticate()

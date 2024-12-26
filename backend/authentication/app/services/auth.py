@@ -93,12 +93,12 @@ def validate_token(token):
 
 def set_cookies(response, tokens: list):
     httponly=True
-    samesite='Strict'
+    samesite=None
     secure=True
 
-    dev_mode = bool(strtobool(os.getenv('DEV_MODE', 'false')))
-    if dev_mode:
-        secure = False  # Use True when app is using HTTPS
+    # dev_mode = bool(strtobool(os.getenv('DEV_MODE', 'false')))
+    # if dev_mode:
+    #     secure = False  # Use True when app is using HTTPS
 
     cookie_configs = {
         'access_token': {'max_age': 60 * 15}, # 15 minutes
@@ -110,7 +110,7 @@ def set_cookies(response, tokens: list):
             token['type'],
             token['token'],
             httponly=httponly,
-            samesite=samesite,
+            # samesite=samesite,
             secure=secure,
             max_age=cookie_configs[token['type']].get('max_age')
         )
