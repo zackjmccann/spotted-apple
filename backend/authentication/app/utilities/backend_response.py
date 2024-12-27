@@ -6,7 +6,7 @@ from flask import Response
 
 class BackendResponse(Response):
     def __init__(self, *args, **kwargs):
-        response = self._parse_response(args[0])
+        response = self._parse_response(args)
         headers = self._update_headers(kwargs.get('headers', None))
         kwargs['content_type'] = 'application/json'
         kwargs['mimetype'] = 'application/json'
@@ -16,6 +16,10 @@ class BackendResponse(Response):
         super().__init__(response['data'], **kwargs)
 
     def _parse_response(self, response):
+        if len(response) == 0: # For Flask OPTIONS handling
+            return {'code': 200, 'data': None}
+
+        response = response[0]
         if type(response) == str:
             response = json.loads(response)
         return {
@@ -30,5 +34,6 @@ class BackendResponse(Response):
             'Access-Control-Allow-Origin': 'http://localhost:3000',
             'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+            'Access-Control-Allow-Credentials': 'true'
             })
         return headers
