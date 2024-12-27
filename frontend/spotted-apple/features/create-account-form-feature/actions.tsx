@@ -1,6 +1,6 @@
 import { CreateAccountFormSchema } from '@/features/create-account-form-feature/schemas'
 import { SignUpState } from '@/features/sign-up-feature/types'
-import { checkIfEmailExists } from '@/app/(auth)/api/route'
+import { checkIfEmailExists } from '@/data-access/auth/auth'
 
 function validateFields(formData: FormData) {
     return CreateAccountFormSchema.safeParse({
