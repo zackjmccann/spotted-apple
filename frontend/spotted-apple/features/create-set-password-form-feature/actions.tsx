@@ -1,5 +1,3 @@
-"use client";
-
 import { SetPasswordFormSchema } from '@/features/create-set-password-form-feature/schemas'
 import { SignUpState } from '@/features/sign-up-feature/types'
 
