@@ -3,10 +3,10 @@
 import { ChangeEvent, useState, } from 'react'
 import { FormField, FormFieldError, SubmitButton } from '@/lib/forms/components'
 import { ButtonDisplay, InputFields, InputFieldErrorState} from '@/lib/forms/types'
-import { SetPasswordFormProps } from '@/features/create-set-password-form-feature/types';
+import { SignUpProps } from '@/features/sign-up-feature/types';
 
 
-export default function SetPasswordForm({state, formAction}: SetPasswordFormProps) {
+export default function SetPasswordForm({state, action}: SignUpProps) {
     // TODO: Display one error message at the bottom, not per field
     const initialErrorState: InputFieldErrorState = {email: true, password: true, confirmPassword: true};
     const [intputState, setInput] = useState(state.formData);
@@ -42,10 +42,12 @@ export default function SetPasswordForm({state, formAction}: SetPasswordFormProp
         },
         {
             id: 'password',
+            fieldType: 'password',
             onChange: onChange
         },
         {
             id: 'confirmPassword',
+            fieldType: 'password',
             onChange: onChange
         },
     ]
@@ -55,7 +57,7 @@ export default function SetPasswordForm({state, formAction}: SetPasswordFormProp
     const buttonValues: ButtonDisplay = {staticDisplay: 'Set Password', pendingDisplay: 'setting password...'}
 
     return (
-        <form id={formId} className={formId} action={formAction} onSubmit={onSubmit}>
+        <form id={formId} className={formId} action={action} onSubmit={onSubmit}>
             <p>{formHeader}</p>
             <ul>{fields.map((field) => (
                 <div key={`${field.id}Container`}>

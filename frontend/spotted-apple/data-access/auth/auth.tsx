@@ -1,6 +1,6 @@
 "use server";
 
-import { ClientCredentials, RequestParameters } from '@/data-access/auth/types'
+import { ClientCredentials, RequestParameters, AccountCreationData } from '@/data-access/auth/types'
 import { cookies } from 'next/headers';
 
 const clientCredentials: ClientCredentials = {
@@ -89,11 +89,12 @@ async function refreshTokens(refreshToken: string) {
 
 async function setAuthenticationCookies(authData: Record<string, string>) {
     const cookie_configs: Record<string, number> = {
-        // 'access_token': 60 * 15, // 15 minutes
-        'access_token': 10, // 10 seconds
+        'access_token': 60 * 15, // 15 minutes
         'refresh_token': 7 * 24 * 60 * 60, // 7 days
+        'user_access_token': 60 * 15,
+        'user_refresh_token': 7 * 24 * 60 * 60,
     }
-    
+
     for (const [key, value] of Object.entries(authData)) {
         if (key != 'status') {
             (await cookies()).set({
@@ -101,7 +102,7 @@ async function setAuthenticationCookies(authData: Record<string, string>) {
                 value: value,
                 httpOnly: true,
                 secure: true,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 maxAge: cookie_configs[key],
             })
         }
@@ -114,13 +115,11 @@ export async function getAccessToken() {
     const hasRefreshToken = cookieManager.has('refresh_token')
     
     if (!hasAccessToken && !hasRefreshToken) {
-        console.log('no tokens found...')
         const authResponseData = await authenticateWithBackend()
         await setAuthenticationCookies(authResponseData)
     }
     
     if (!hasAccessToken) {
-        console.log('refreshing tokens...')
         const tokenRefreshResponseData = await refreshTokens(cookieManager.get('refresh_token')!.value)
         await setAuthenticationCookies(tokenRefreshResponseData)
     }
@@ -170,7 +169,7 @@ export async function checkIfEmailExists(email: string): Promise<boolean | null>
         body: {'email': email},
         authToken: token,
     }
-
+    
     try {
         const response = await authService(requestdata)
         try {
@@ -183,4 +182,30 @@ export async function checkIfEmailExists(email: string): Promise<boolean | null>
         console.error('Failed to check email register:', error)
     }
     return emailExists
+}
+
+export async function createAccount({email, password, firstName, lastName}: AccountCreationData) {
+    let userAccessToken: string | null = null
+    let userRefreshToken: string | null = null
+
+    const token = await getAccessToken()
+    
+    const requestdata: RequestParameters = {
+        method: 'POST',
+        endpoint: '/register/account',
+        body: {email: email, password: password, firstName: firstName, lastName: lastName},
+        authToken: token,
+    }
+
+    try {
+        const response = await authService(requestdata)
+        try {
+            const userData = await response!.json()
+            await setAuthenticationCookies(userData)
+        } catch (error) {
+            console.error('Failed to process response:', error)
+        }
+    } catch (error) {
+        console.error('Failed to register account:', error)
+    }
 }

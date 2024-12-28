@@ -3,9 +3,10 @@
 import { ChangeEvent, useState, } from 'react'
 import { FormField, FormFieldError, SubmitButton } from '@/lib/forms/components'
 import { ButtonDisplay, InputFields, InputFieldErrorState} from '@/lib/forms/types'
-import { CreateAccountFormProps } from '@/features/create-account-form-feature/types';
+import { SignUpProps } from '@/features/sign-up-feature/types';
 
-export default function CreateAccountForm({state, formAction}: CreateAccountFormProps) {
+
+export default function CreateAccountForm({state, action}: SignUpProps) {
     const initialErrorState: InputFieldErrorState = {email: true, firstName: true, lastName: true};
     const [intputState, setInput] = useState(state.formData);
     const [errorState, displayError] = useState(initialErrorState) 
@@ -58,7 +59,7 @@ export default function CreateAccountForm({state, formAction}: CreateAccountForm
     const buttonValues: ButtonDisplay = {staticDisplay: 'Create Account', pendingDisplay: 'creating account...'}
 
     return (
-        <form id={formId} className={formId} action={formAction} onSubmit={onSubmit}>
+        <form id={formId} className={formId} action={action} onSubmit={onSubmit}>
             <p>{formHeader}</p>
             <ul>{fields.map((field) => (
                 <div key={`${field.id}Container`}>

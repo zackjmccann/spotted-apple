@@ -1,5 +1,5 @@
 import { CreateAccountFormSchema } from '@/features/create-account-form-feature/schemas'
-import { SignUpState } from '@/features/sign-up-feature/types'
+import { SignUpState, AccountData } from '@/features/sign-up-feature/types'
 import { checkIfEmailExists } from '@/data-access/auth/auth'
 
 function validateFields(formData: FormData) {
@@ -22,26 +22,31 @@ export async function createAccount(prevState: SignUpState, formData: FormData,)
             passwordSet: false,
             errors: formErrors,
             formData: enterValues};
-        };
+    };
         
-        // Check user email
-        const emailExists: boolean | null = await checkIfEmailExists(enterValues.email);
+    // Check user email
+    const emailExists: boolean | null = await checkIfEmailExists(enterValues.email);
 
-        if(emailExists == null) {
-            return {
-                created: false,
-                passwordSet: false,
-                errors: {email: ['An error occurred during email registration check.']},
-                formData: enterValues};
-        }
+    if(emailExists == null) {
+        return {
+            created: false,
+            passwordSet: false,
+            errors: {email: ['An error occurred during email registration check.']},
+            formData: enterValues};
+    }
 
-        if(emailExists) {
-            return {
-                created: false,
-                passwordSet: false,
-                errors: {email: ['Email already exists. Please login.']},
-                formData: enterValues};
-        }
+    if(emailExists) {
+        return {
+            created: false,
+            passwordSet: false,
+            errors: {email: ['Email already exists. Please login.']},
+            formData: enterValues};
+    }
 
-    return { created: true, passwordSet: false, formData: enterValues, } as SignUpState;
+    return {
+        created: true,
+        passwordSet: false,
+        accountData: enterValues as AccountData,
+        formData: enterValues
+    } as SignUpState;
 };

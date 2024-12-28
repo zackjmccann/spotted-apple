@@ -14,3 +14,10 @@ export type RequestParameters = {
     headers?: Record<string, string>;
     authToken?: string
 }
+
+export type AccountCreationData = {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+}
