@@ -52,6 +52,25 @@ class Aloe(Postgres):
             logger.critical('Failed to insert new account info')
             return {'email': None, 'id': -1, 'created': None}
 
+    def create_user(self, id: int, email: str, first_name: str, last_name: str):
+        query_data = {
+            'text': 'SELECT fk_id AS id, email, first_name, last_name, created, modified FROM create_user(%(id)s, %(email)s, %(first_name)s, %(last_name)s);',
+            'values': {
+                'id': id,
+                'email': email,
+                'first_name': first_name,
+                'last_name': last_name,
+            }
+        }
+
+        results = self.execute_query(query_data=query_data, return_method='fetchone', cursor_type='RealDictCursor')
+        try:
+            assert type(results) != errors.UniqueViolation
+            return results
+        except AssertionError:
+            logger.critical('Failed to create new user')
+            return {'id': -1, 'email': None, 'created': None}
+
     def delete_user(self, id: int) -> int:
         query_data = {
             'text': f'DELETE FROM account_access_info WHERE id = %(id)s '
