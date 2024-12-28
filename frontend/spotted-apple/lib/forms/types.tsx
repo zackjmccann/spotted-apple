@@ -4,6 +4,7 @@ export type InputField = {
     id: string;
     placeHolder?: string;
     initialValue?: string;
+    fieldType?: string;
     onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 };
 

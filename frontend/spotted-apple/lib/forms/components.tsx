@@ -3,12 +3,13 @@
 import { useFormStatus } from 'react-dom'
 import { InputField, ButtonDisplay, InputFieldsErrors} from '@/lib/forms/types'
 
-export function FormField({id, placeHolder, initialValue, onChange}: InputField) {
+export function FormField({id, placeHolder, initialValue, fieldType, onChange}: InputField) {
     return (<input
                 id={`${id}Input`}
                 name={id}
                 placeholder={placeHolder}
                 value={initialValue}
+                type={fieldType}
                 onChange={onChange ? (ev: any) => onChange(ev) : undefined}
             />
     )
