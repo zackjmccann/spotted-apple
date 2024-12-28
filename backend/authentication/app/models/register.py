@@ -11,8 +11,16 @@ account_payload_schema = {
             'type': 'string',
             'minLength': 1
             },
+        'firstName': {
+            'type': 'string',
+            'minLength': 1
+            },
+        'LastName': {
+            'type': 'string',
+            'minLength': 1
+            },
     },
-    'required': ['email', 'password'],
+    'required': ['email', 'password', 'firstName', 'lastName'],
 }
 
 registered_check_payload_schema = {

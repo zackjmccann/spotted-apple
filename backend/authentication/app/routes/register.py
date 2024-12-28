@@ -1,5 +1,7 @@
 from flask import Blueprint, request
 from services.register import register_account, check_if_acccount_is_registered
+from services.auth import issue_token
+
 
 register = Blueprint('register', __name__)
 
@@ -10,10 +12,15 @@ def account():
         account = register_account(data)
 
         if account.get('id', -1) != -1:
+            access_token = issue_token(account.get('email'), account.get('id'), 10)
+            refresh_token = issue_token(account.get('email'), account.get('id'), 10080) # 7 days
+
             return {
                 'code': 201,
                 'data': {
-                    'account': account
+                    'status': 'Account Created',
+                    'user_access_token': access_token,
+                    'user_refresh_token': refresh_token,
                     },
                 }
         else:
