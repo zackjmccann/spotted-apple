@@ -9,5 +9,5 @@ export type FormAction = (payload: FormData) => void;
 
 export type SignUpProps = {
   state: SignUpState;
-  formAction: FormAction;
+  action: FormAction;
 }
