@@ -8,7 +8,7 @@ export const SetPasswordFormSchema = z.object({
       .regex(/[a-z]/, "Password must include at least one lowercase letter")
       .regex(/[A-Z]/, "Password must include at least one uppercase letter")
       .regex(/\d/, "Password must include at least one number")
-      .regex(/[!@#$%^&*(),.?":{}|<>]/, "Password must include at least one special character")
+      .regex(/[!@~#$%^&*(),.?":{}|<>]/, "Password must include at least one special character")
       .regex(/^\S*$/, "Password must not contain spaces"),
     confirmPassword: z.string()
   })
