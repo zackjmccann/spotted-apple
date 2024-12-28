@@ -12,7 +12,7 @@ export default function Page() {
   const initialSignUpState: SignUpState = {created: false, passwordSet: false};
   const [state, formAction] = useActionState(signUp, initialSignUpState)
   const signUpProps: SignUpProps = {state: state, action: formAction}
-  console.log('State:', state)
+
   return (
     <main className="flex min-h-screen flex-row items-center justify-around p-12">
         <Banner />
