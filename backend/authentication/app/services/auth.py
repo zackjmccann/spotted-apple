@@ -3,6 +3,7 @@ import jwt
 import datetime
 from distutils.util import strtobool
 from models.credentials import credentials_payload_schema
+from models.login import login_payload_schema
 from utilities.payload_handlers import sanitize
 from jsonschema import ValidationError
 from database import aloe
@@ -139,3 +140,19 @@ def blacklist_token(token):
 
 def parse_token(token):
     return jwt.decode(token, SECRET_KEY, algorithms=[ALOGRITHMS], audience=APP_ID)
+
+def get_authorization_code(payload, url_parameters):
+    try:
+        playload_mapping = {'email': 'str', 'password': 'str', 'grant_type': 'str'}
+        clean_payload = sanitize(payload, login_payload_schema, playload_mapping)
+        
+        # # TODO: Add authorization validation
+        url_parameters_valid = True
+        assert url_parameters_valid
+
+        response = aloe.authenticate_user(clean_payload)
+        assert response['valid']
+        authorization_code = 'authcode'
+        return authorization_code
+    except (AssertionError, ValidationError):
+        raise AuthenticationError('Failed to authenticate')
