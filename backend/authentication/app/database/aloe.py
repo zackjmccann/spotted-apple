@@ -10,37 +10,12 @@ class Aloe(Postgres):
     def __init__(self):
         super().__init__()
 
-    def get_user(self, id) -> dict:
+    def register_account(self, email: str, password: str):
         query_data = {
-            'text': f'SELECT id, created, email, first_name, last_name '
-                    f'FROM account_access_info WHERE id = %(id)s;',
-            'values': {'id': id}
-        }
-
-        return self.execute_query(
-            query_data=query_data,
-            return_method='fetchone',
-            cursor_type='RealDictCursor')
-
-    def get_user_email(self, email) -> dict:
-        query_data = {
-            'text': f'SELECT email '
-                    f'FROM account_access_info WHERE email = %(email)s;',
-            'values': {'email': email}
-        }
-
-        return self.execute_query(
-            query_data=query_data,
-            return_method='fetchone',
-            cursor_type='RealDictCursor')
-
-    def register_account(self, email: str, password_hash: str, password_salt: str):
-        query_data = {
-            'text': 'SELECT email, id, created FROM register_account(%(email)s, %(password_hash)s, %(password_salt)s);',
+            'text': 'SELECT email, id, created FROM register_account(%(email)s, %(password)s);',
             'values': {
                 'email': email,
-                'password_hash': password_hash,
-                'password_salt': password_salt
+                'password': password,
             }
         }
 
@@ -128,3 +103,39 @@ class Aloe(Postgres):
             return results
         except AssertionError:
             raise KeyError('Failed to blacklist token')
+
+    def authenticate_user(self, user_account_credentials):
+        query_data = {
+            'text': 'SELECT authenticate_user(%(email)s, %(password)s) AS valid;',
+            'values': {
+                'email': user_account_credentials['email'],
+                'password': user_account_credentials['password'],
+                }
+        }
+        return self.execute_query(
+            query_data=query_data,
+            return_method='fetchone',
+            cursor_type='RealDictCursor')
+
+    def get_user_email(self, email) -> dict:
+        query_data = {
+            'text': f'SELECT email '
+                    f'FROM account_access_info WHERE email = %(email)s;',
+            'values': {'email': email}
+        }
+
+        return self.execute_query(
+            query_data=query_data,
+            return_method='fetchone',
+            cursor_type='RealDictCursor')
+
+    def get_user(self, account_id) -> dict:
+        query_data = {
+            'text': 'SELECT fk_id AS id, email, first_name, last_name, created, modified FROM get_user_account(%(id)s);',
+            'values': { 'id': account_id }
+        }
+
+        return self.execute_query(
+            query_data=query_data,
+            return_method='fetchone',
+            cursor_type='RealDictCursor')
