@@ -26,6 +26,7 @@ export async function setPassword(prevState: SignUpState, formData: FormData) {
             created: prevState.created,
             passwordSet: false,
             errors: formErrors,
+            accountData: prevState.accountData,
             formData: enterValues};
     };
 
@@ -45,7 +46,8 @@ export async function setPassword(prevState: SignUpState, formData: FormData) {
         return {
             created: prevState.created,
             passwordSet: false,
-            formData: enterValues
+            accountData: prevState.accountData,
+            formData: enterValues,
         } as SignUpState;
         
     }
