@@ -1,6 +1,6 @@
 from werkzeug.wrappers import Request
 from utilities import BackendResponse
-from services.auth import authenticate_with_auth_server
+from services.auth import validate_authorization_token
 
 
 class Authenticator:
@@ -19,14 +19,14 @@ class Authenticator:
                     }
             })(environment, start_response)
 
-        response = authenticate_with_auth_server(request)
+        response = validate_authorization_token(request)
 
         if not response['valid']:
             return BackendResponse({
                 'code': response['code'],
                 'data': {
-                    'status': response['status'],
-                    'message': response['message'],
+                    'status': 'Failed',
+                    'message': 'Unauthorized'
                     }
             })(environment, start_response)
 
