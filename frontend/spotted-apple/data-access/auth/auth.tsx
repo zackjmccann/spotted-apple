@@ -89,9 +89,9 @@ async function refreshTokens(refreshToken: string) {
 
 async function setAuthenticationCookies(authData: Record<string, string>) {
     const cookie_configs: Record<string, number> = {
-        'access_token': 60 * 15, // 15 minutes
+        'access_token': 10, // 10 seconds
         'refresh_token': 7 * 24 * 60 * 60, // 7 days
-        'user_access_token': 60 * 15,
+        'user_access_token': 10,
         'user_refresh_token': 7 * 24 * 60 * 60,
     }
 
