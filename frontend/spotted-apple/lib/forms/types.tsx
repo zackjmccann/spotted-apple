@@ -1,5 +1,7 @@
 import { ChangeEvent } from 'react'
 
+export type FormAction = (payload: FormData) => void;
+
 export type InputField = {
     id: string;
     placeHolder?: string;
