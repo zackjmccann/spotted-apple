@@ -2,6 +2,7 @@
 A Subclass of the flask.Response class.
 """
 import json
+from json.decoder import JSONDecodeError
 from flask import Response
 
 class BackendResponse(Response):
@@ -16,12 +17,25 @@ class BackendResponse(Response):
         super().__init__(response['data'], **kwargs)
 
     def _parse_response(self, response):
-        if type(response) == str:
-            response = json.loads(response)
-        return {
-            'code': response['code'],
-            'data': json.dumps(response['data']),
-            }
+        try:
+            if len(response) == 0: # For Flask OPTIONS handling
+                return {'code': 200, 'data': None}
+            elif type(response) == tuple or type(response) == list:
+                response = response[0]
+
+            if type(response) == str:
+                response = json.loads(response)
+            
+            return {
+                'code': response['code'],
+                'data': json.dumps(response['data']),
+                }
+
+        except JSONDecodeError:
+            return {
+                'code': response['code'],
+                'data': None,
+                }
 
     def _update_headers(self, headers):
         if headers is None:
