@@ -25,5 +25,33 @@ export async function setCookie({name, value, maxAge}: Cookie) {
         sameSite: 'lax',
         maxAge: maxAge,
     });
-    logger.debug(`Set Cookie: ${name}`)
+    // logger.debug(`Set Cookie: ${name}`)
 };
+
+/**
+ * Check if a cookie exists
+ * 
+ * Simply wrapper for Next cookies module, but exists to consolidate
+ * all cookie interactions through this module (no need to interact with
+ * next/headers and initialize cookieManager).
+ * @param {string} name - Name of cookie to check for
+ * @returns {Promise<Boolean>}
+ */
+export async function checkForCookie(name: string): Promise<Boolean> {
+    const cookieManager = await cookies();
+    return cookieManager.has(name)
+};
+
+/**
+ * Check if a cookie exists
+ * 
+ * Simply wrapper for Next cookies module, but exists to consolidate
+ * all cookie interactions through this module (no need to interact with
+ * next/headers and initialize cookieManager).
+ * @param {string} name - Name of cookie to retrieve
+ * @returns {Promise<string>}
+*/
+export async function getCookie(name: string): Promise<string> {
+    const cookieManager = await cookies();
+    return cookieManager.get(name)!.value
+}
