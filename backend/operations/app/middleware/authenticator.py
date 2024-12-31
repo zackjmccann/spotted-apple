@@ -10,6 +10,9 @@ class Authenticator:
     def __call__(self, environment, start_response):
         request = Request(environment)
 
+        if request.path[:5] == '/auth' or request.method == 'OPTIONS':
+            return self.wsgi_app(environment, start_response)
+
         if 'Authorization' not in request.headers:
             return BackendResponse({
                 'code': 400,
