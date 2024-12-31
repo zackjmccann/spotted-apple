@@ -7,35 +7,41 @@ from flask import Response
 
 class BackendResponse(Response):
     def __init__(self, *args, **kwargs):
-        response = self._parse_response(args[0])
-        headers = self._update_headers(kwargs.get('headers', None))
-        kwargs['content_type'] = 'application/json'
-        kwargs['mimetype'] = 'application/json'
-        kwargs['direct_passthrough'] = False
-        kwargs['status'] = response['code']
-        kwargs['headers'] = headers
-        super().__init__(response['data'], **kwargs)
+        response_args = self._handle_args(args)
+        response_kwargs = self._handle_kwargs(kwargs)
+        response_kwargs['status'] = response_args['code']
+        super().__init__(response_args['data'], **response_kwargs)
 
-    def _parse_response(self, response):
+    def _handle_args(self, args):
+        response = None
         try:
-            if len(response) == 0: # For Flask OPTIONS handling
+            if type(args) == tuple:
+                try:
+                    response = args[0]
+                except IndexError:
+                    response = None
+            if response is None or len(response) == 0: # For Flask OPTIONS handling
                 return {'code': 200, 'data': None}
-            elif type(response) == tuple or type(response) == list:
-                response = response[0]
-
             if type(response) == str:
                 response = json.loads(response)
-            
             return {
                 'code': response['code'],
                 'data': json.dumps(response['data']),
                 }
-
         except JSONDecodeError:
             return {
                 'code': response['code'],
                 'data': None,
                 }
+
+    def _handle_kwargs(self, kwargs):
+        headers = self._update_headers(kwargs.get('headers', None))
+        if 'mimetype' in kwargs.keys():
+            del kwargs['mimetype']
+        kwargs['content_type'] = 'application/json'
+        kwargs['direct_passthrough'] = False
+        kwargs['headers'] = headers
+        return kwargs
 
     def _update_headers(self, headers):
         if headers is None:
