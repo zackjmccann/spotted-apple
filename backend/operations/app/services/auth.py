@@ -42,16 +42,13 @@ def authenticate_with_auth_server(request):
         payload = request.get_json()
         validate(instance=payload, schema=login_payload_schema)
 
-        state = generate_state()                   # TODO: Consider generating this on the client side, and decrypting it here
-        code_challenge = generate_code_challenge() # TODO: Consider generating this on the client side, and decrypting it here
-
         query_parameters = {
             'client_id': CLIENT_ID, # TODO: Clients should provide this, not the ops server?
             'redirect_uri': 'http://localhost:8000/auth/callback', # TODO: Don't hard code this
-            'state': state,
+            'state': 'state',
             'response_type': 'code',
             'scope': 'profile offline_access openid',
-            'code_challenge': code_challenge,
+            'code_challenge': 'code_challenge',
             'code_challenge_method': 'S256',
             'email': payload.get('email'),
             'password': payload.get('password'),
@@ -62,8 +59,8 @@ def authenticate_with_auth_server(request):
         auth_service = f'http://{AUTH_SERVICE}/auth/authorize'
 
         jar = requests.cookies.RequestsCookieJar()
-        jar.set('oauth_state', state, secure=False, rest={"HttpOnly": True},)
-        jar.set('oauth_code', code_challenge, secure=False, rest={"HttpOnly": True},)
+        jar.set('oauth_state', 'state', secure=False, rest={"HttpOnly": True},)
+        jar.set('oauth_code', 'code_challenge', secure=False, rest={"HttpOnly": True},)
 
         return requests.get(
             url=auth_service,
