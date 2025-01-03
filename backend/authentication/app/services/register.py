@@ -1,5 +1,4 @@
 import os
-import bcrypt
 from database import aloe
 from auth_logging import logger
 from models.register import account_payload_schema, registered_check_payload_schema
@@ -17,8 +16,7 @@ def register_account(payload):
         playload_mapping = {'email': 'str', 'password': 'str', 'firstName': 'str', 'lastName': 'str'}
         clean_payload = sanitize(payload, account_payload_schema, playload_mapping)
         clean_email, clean_password, clean_first_name, clean_last_name = clean_payload.values()
-        password_hash, password_salt = _hash_password(clean_password)
-        new_account = aloe.register_account(clean_email, password_hash, password_salt)
+        new_account = aloe.register_account(clean_email, clean_password)
 
         # TODO: Create a user with the new_account data
         new_user_id = new_account.get('id') # Foreign Key to auth table
@@ -62,9 +60,3 @@ def check_if_acccount_is_registered(payload):
                 'message': 'Registration check was unsuccessful',
                 },
             }
-
-def _hash_password(password):
-    hash_bytes = bytes(password, 'utf-8')
-    salt = bcrypt.gensalt()
-    hash = bcrypt.hashpw(hash_bytes, salt).hex()
-    return hash, str(salt)

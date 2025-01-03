@@ -9,10 +9,9 @@ export type ClientCredentials = {
 export type RequestParameters = {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
     endpoint: string;
-    queryParameters?: Record<string, string>;
-    body?: Record<string, string>;
+    queryParameters?: Record<string, any>;
+    body?: Record<string, any>;
     headers?: Record<string, string>;
-    authToken?: string
 }
 
 export type AccountCreationData = {

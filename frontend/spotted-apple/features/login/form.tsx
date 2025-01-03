@@ -2,14 +2,13 @@
 
 import { ChangeEvent, useState, } from 'react'
 import { FormField, SubmitButton } from '@/lib/forms/components'
-import { PassowrdFormFieldError } from '@/features/create-set-password-form-feature/components'
 import { ButtonDisplay, InputFields, InputFieldErrorState} from '@/lib/forms/types'
-import { SignUpProps } from '@/features/sign-up-feature/types';
+import { LoginProps } from '@/features/login/types';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 
-export default function SetPasswordForm({state, action}: SignUpProps) {
-    const initialErrorState: InputFieldErrorState = {email: true, password: true, confirmPassword: true};
+export default function LoginForm({state, action}: LoginProps) {
+    const initialErrorState: InputFieldErrorState = {email: true, password: true};
     const [intputState, setInput] = useState(state.formData);
     const [errorState, displayError] = useState(initialErrorState) 
     const [showPassword, setShowPassword] = useState('password');
@@ -47,23 +46,21 @@ export default function SetPasswordForm({state, action}: SignUpProps) {
         {
             id: 'email',
             initialValue: intputState && intputState.email ? intputState.email : "",
+            placeHolder: 'Email',
             onChange: onChange,
         },
         {
             id: 'password',
             fieldType: showPassword,
-            onChange: onChange
-        },
-        {
-            id: 'confirmPassword',
-            fieldType: showPassword,
+            placeHolder: 'Password',
             onChange: onChange
         },
     ]
 
-    const formId = 'setPassword';
-    const formHeader = 'Set a password for your account';
-    const buttonValues: ButtonDisplay = {staticDisplay: 'Set Password', pendingDisplay: 'setting password...'}
+    const formId = 'login';
+    const formHeader = 'Log into your account';
+    const buttonValues: ButtonDisplay = {staticDisplay: 'Login', pendingDisplay: 'logging in...'}
+    const errorMessage: string = 'Email and/or Password Invlaid.'
 
     return (
         <form id={formId} className={formId} action={action} onSubmit={onSubmit}>
@@ -79,8 +76,8 @@ export default function SetPasswordForm({state, action}: SignUpProps) {
                 </div>
                 ))}
             </ul>
-            {state.errors ? <PassowrdFormFieldError {...state.errors} /> : null }
-            <SubmitButton key='setPasswordSubmitButton' {...buttonValues}/>
+            {state.errors ? <p key='LoginError' className='errorField'>{errorMessage}</p> : null }
+            <SubmitButton key='loginSubmitButton' {...buttonValues}/>
         </form>
     )
 };

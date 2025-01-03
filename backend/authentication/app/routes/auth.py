@@ -1,4 +1,7 @@
 from flask import Blueprint, request, make_response
+from urllib.parse import urlencode
+from werkzeug.utils import redirect
+from werkzeug.exceptions import UnsupportedMediaType
 from services.auth import (
     authenticate,
     validate_token,
@@ -7,12 +10,23 @@ from services.auth import (
     is_blacklisted_token,
     blacklist_token,
     parse_token,
+    get_authorization_code,
+    AuthenticationError
     )
 
 auth = Blueprint('auth', __name__)
 
 @auth.route('/token', methods=["POST"])
 def get_token():
+    """
+    TODO: should expect these payload values:
+        code
+        client_id
+        client_secret
+        code_verifier
+        grant_type
+        redirect_uri
+    """
     try:
         data = request.get_json()
         response = authenticate(data)
@@ -163,4 +177,84 @@ def revoke_token():
                 'status': 'Failed',
                 'message': 'Unable to process token blacklist request'
                 },
+        }
+
+@auth.route('/authorize', methods=['GET'])
+def authorize():
+    print(f'Request Cookies: {request.cookies}')
+    try:
+        payload = {
+            'email': request.args.get('email'),
+            'password': request.args.get('password'),
+            'grant_type': request.args.get('grant_type'),
+        }
+
+        parameters = {
+            'client_id': request.args.get('client_id'),
+            'redirect_uri': request.args.get('redirect_uri'),
+            'state': request.args.get('state'),
+            'response_type': request.args.get('response_type'),
+            'scope': request.args.get('scope'),
+            'code_challenge': request.args.get('code_challenge'),
+            'code_challenge_method': request.args.get('code_challenge_method'),
+        }
+
+        # Any failure here raises an AuthenticationError
+        authorization_code = get_authorization_code(payload, parameters)
+        redirect_uri = parameters['redirect_uri']
+        query_parameters = {
+            'code': authorization_code,
+            'state': parameters['state']
+        }
+        params = urlencode(query_parameters)
+        return redirect(location=f'{redirect_uri}?{params}', code=302)
+
+    except (TypeError, KeyError, UnsupportedMediaType, AuthenticationError):
+        return {
+            'code': 405,
+            'data': {
+                'status': 'Failed',
+                'message': 'Unable to process authorization request',
+            }
+        }
+
+@auth.route('/authorize/client', methods=['POST'])
+def authorize_client():
+    try:
+        payload = request.get_json()
+        response = authenticate(payload)
+        if not response['valid']:
+            raise AuthenticationError
+        return {'code': 200, 'data': {'authorized': True}}
+    except (TypeError, KeyError, UnsupportedMediaType, AuthenticationError):
+        return {
+            'code': 401,
+            'data': {
+                'status': 'Failed',
+                'message': 'Unable to process authorization request',
+            }
+        }
+
+@auth.route('/authorize/user', methods=['POST'])
+def authorize_user():
+    try:
+        payload = request.get_json()
+        auth_code = get_authorization_code(payload)
+        state = payload.get('state', None)
+        
+        if not state:
+            raise AuthenticationError
+        
+        return {
+            'code': 200,
+            'data': { 'code': auth_code, 'state': state, },
+            }
+
+    except (TypeError, KeyError, UnsupportedMediaType, AuthenticationError):
+        return {
+            'code': 401,
+            'data': {
+                'status': 'Failed',
+                'message': 'Unable to process authorization request',
+            }
         }

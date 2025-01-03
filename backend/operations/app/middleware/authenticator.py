@@ -1,6 +1,6 @@
 from werkzeug.wrappers import Request
 from utilities import BackendResponse
-from services.auth import authenticate_with_auth_server
+from services.auth import validate_authorization_token
 
 
 class Authenticator:
@@ -9,6 +9,9 @@ class Authenticator:
     
     def __call__(self, environment, start_response):
         request = Request(environment)
+
+        if request.path[:5] == '/auth' or request.method == 'OPTIONS':
+            return self.wsgi_app(environment, start_response)
 
         if 'Authorization' not in request.headers:
             return BackendResponse({
@@ -19,14 +22,14 @@ class Authenticator:
                     }
             })(environment, start_response)
 
-        response = authenticate_with_auth_server(request)
+        response = validate_authorization_token(request)
 
         if not response['valid']:
             return BackendResponse({
                 'code': response['code'],
                 'data': {
-                    'status': response['status'],
-                    'message': response['message'],
+                    'status': 'Failed',
+                    'message': 'Unauthorized'
                     }
             })(environment, start_response)
 

@@ -2,7 +2,7 @@
 
 import { SetPasswordFormSchema } from '@/features/create-set-password-form-feature/schemas'
 import { SignUpState } from '@/features/sign-up-feature/types'
-import { createAccount } from '@/data-access/auth/auth'
+import { createAccount } from '@/data-access/auth'
 import { AccountCreationData } from '@/data-access/auth/types'
 import { cookies } from 'next/headers';
 
