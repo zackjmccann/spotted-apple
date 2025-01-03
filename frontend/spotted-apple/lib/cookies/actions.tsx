@@ -1,8 +1,8 @@
-"use server";
+'use server'
 
 import logger from '@/lib/logging'
 import { Cookie } from '@/lib/cookies/types'
-import { cookies } from 'next/headers';
+import { cookies } from 'next/headers'
 
 /**
  * setCookie is a server actions for setting cookies on the browser.
@@ -25,7 +25,6 @@ export async function setCookie({name, value, maxAge}: Cookie) {
         sameSite: 'lax',
         maxAge: maxAge,
     });
-    // logger.debug(`Set Cookie: ${name}`)
 };
 
 /**
@@ -51,7 +50,30 @@ export async function checkForCookie(name: string): Promise<Boolean> {
  * @param {string} name - Name of cookie to retrieve
  * @returns {Promise<string>}
 */
-export async function getCookie(name: string): Promise<string> {
+export async function getCookie(name: string): Promise<string | undefined> {
     const cookieManager = await cookies();
-    return cookieManager.get(name)!.value
+    try {
+        return cookieManager.get(name)!.value
+    } catch (error) {
+        if (error instanceof TypeError) {
+            logger.error(`Cookie "${name}" not found.`)
+        } else {
+            const err = error instanceof Error ? error.message : String(error)
+            logger.error(`Cookie retrieval failed: ${err}`)
+        }
+    }
+}
+
+/**
+ * Check if a cookie exists
+ * 
+ * Simply wrapper for Next cookies module, but exists to consolidate
+ * all cookie interactions through this module (no need to interact with
+ * next/headers and initialize cookieManager).
+ * @param {string} name - Name of cookie to retrieve
+ * @returns {Promise<string>}
+*/
+export async function getAllCookies(): Promise<any> {
+    const cookieManager = await cookies();
+    return cookieManager.getAll()
 }
