@@ -1,9 +1,11 @@
 import os
 import jwt
+import json
 import datetime
 from distutils.util import strtobool
-from models.credentials import credentials_payload_schema
+from models.client_credentials import client_credentials_payload_schema
 from models.login import login_payload_schema
+from models.url_parameters import url_parameters_schema
 from utilities.payload_handlers import sanitize
 from jsonschema import ValidationError
 from database import aloe
@@ -21,26 +23,17 @@ if None in [SECRET_KEY, ALOGRITHMS, APP_ID]:
 
 def authenticate(payload):
     try:
-        playload_mapping = {'username': 'str', 'password': 'str', 'id': 'int', 'grant_type': 'str'}
-        clean_payload = sanitize(payload, credentials_payload_schema, playload_mapping)
+        playload_mapping = {'id': 'str', 'username': 'str', 'password': 'str', 'grant_type': 'str'}
+        clean_payload = sanitize(payload, client_credentials_payload_schema, playload_mapping)
         response = aloe.authenticate_client(clean_payload)
         clean_payload.update(response)
 
         if not response['valid']:
-            response.update({
-                'code': 401,
-                'status': 'Authentication Failed',
-                'message': 'Unable to authenticate',
-            })
+            raise AuthenticationError
 
         return clean_payload
     except (ValidationError, ValueError, KeyError):
-        return {
-            'code': 401,
-            'valid': False,
-            'status': 'Authentication Failed',
-            'message': 'Unable to authenticate',
-            }
+        raise AuthenticationError
 
 def issue_token(username, id, exp=5):
     data = {
@@ -65,6 +58,7 @@ def validate_token(token):
     try:
         assert not is_blacklisted_token(token)
         data = jwt.decode(token, SECRET_KEY, algorithms=[ALOGRITHMS], audience=APP_ID)
+        # TODO: Test GRANTED_APP_IDS = json.loads(os.environ['GRANTED_APP_IDS'])
         # for aud in data['aud']:
         #     assert aud in GRANTED_APP_IDS
 
@@ -141,18 +135,43 @@ def blacklist_token(token):
 def parse_token(token):
     return jwt.decode(token, SECRET_KEY, algorithms=[ALOGRITHMS], audience=APP_ID)
 
-def get_authorization_code(payload, url_parameters):
+def get_authorization_code(payload):
     try:
-        playload_mapping = {'email': 'str', 'password': 'str', 'grant_type': 'str'}
+        playload_mapping = {
+            'client_id': 'str',
+            'state': 'str',
+            'response_type': 'str',
+            'scope': 'str',
+            # 'code_challenge': 'str',
+            # 'code_challenge_method': 'str',
+            'email': 'str',
+            'password': 'str',
+            'grant_type': 'str',
+        }
         clean_payload = sanitize(payload, login_payload_schema, playload_mapping)
+        response = aloe.authenticate_user({
+            'email': clean_payload.get('email', ''),
+            'password': clean_payload.get('password', ''),
+        })
         
-        # # TODO: Add authorization validation
-        url_parameters_valid = True
-        assert url_parameters_valid
-
-        response = aloe.authenticate_user(clean_payload)
-        assert response['valid']
-        authorization_code = 'authcode'
+        if response['valid']:
+            authorization_code = generate_authorization_code()
         return authorization_code
-    except (AssertionError, ValidationError):
-        raise AuthenticationError('Failed to authenticate')
+
+    except (KeyError, ValidationError):
+        raise AuthenticationError
+
+def validate_request_parameters(parameters):
+    CLIENT_ID = os.getenv('CLIENT_ID')
+    REGISTERED_REDIRECT_URLS = json.loads(os.environ['REGISTERED_REDIRECT_URLS'])
+
+    try:
+        assert parameters['client_id'] == CLIENT_ID
+        assert parameters['redirect_uri'] in REGISTERED_REDIRECT_URLS
+        return True
+    except AssertionError:
+        return False
+
+def generate_authorization_code():
+    response = aloe.issue_authorization_code()
+    return response['auth_code']

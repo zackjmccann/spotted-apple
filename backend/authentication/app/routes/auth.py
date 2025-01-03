@@ -18,6 +18,15 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/token', methods=["POST"])
 def get_token():
+    """
+    TODO: should expect these payload values:
+        code
+        client_id
+        client_secret
+        code_verifier
+        grant_type
+        redirect_uri
+    """
     try:
         data = request.get_json()
         response = authenticate(data)
@@ -172,6 +181,7 @@ def revoke_token():
 
 @auth.route('/authorize', methods=['GET'])
 def authorize():
+    print(f'Request Cookies: {request.cookies}')
     try:
         payload = {
             'email': request.args.get('email'),
@@ -202,6 +212,47 @@ def authorize():
     except (TypeError, KeyError, UnsupportedMediaType, AuthenticationError):
         return {
             'code': 405,
+            'data': {
+                'status': 'Failed',
+                'message': 'Unable to process authorization request',
+            }
+        }
+
+@auth.route('/authorize/client', methods=['POST'])
+def authorize_client():
+    try:
+        payload = request.get_json()
+        response = authenticate(payload)
+        if not response['valid']:
+            raise AuthenticationError
+        return {'code': 200, 'data': {'authorized': True}}
+    except (TypeError, KeyError, UnsupportedMediaType, AuthenticationError):
+        return {
+            'code': 401,
+            'data': {
+                'status': 'Failed',
+                'message': 'Unable to process authorization request',
+            }
+        }
+
+@auth.route('/authorize/user', methods=['POST'])
+def authorize_user():
+    try:
+        payload = request.get_json()
+        auth_code = get_authorization_code(payload)
+        state = payload.get('state', None)
+        
+        if not state:
+            raise AuthenticationError
+        
+        return {
+            'code': 200,
+            'data': { 'code': auth_code, 'state': state, },
+            }
+
+    except (TypeError, KeyError, UnsupportedMediaType, AuthenticationError):
+        return {
+            'code': 401,
             'data': {
                 'status': 'Failed',
                 'message': 'Unable to process authorization request',
