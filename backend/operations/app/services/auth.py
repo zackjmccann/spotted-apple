@@ -1,9 +1,6 @@
 import os
 import json
 import requests
-import secrets
-import hashlib
-import base64
 from jsonschema import validate, ValidationError
 from werkzeug.exceptions import UnsupportedMediaType
 from urllib.parse import urlencode
@@ -91,8 +88,36 @@ def exchange_code_for_tokens(code: str, state: str):
         'refresh': code
     }
 
+def client_is_authenticated(payload: dict): # TODO: Change to something like authenticate_client (use a verb)
+    playload_mapping = {
+        'id': 'str',
+        'username': 'str',
+        'password': 'str',
+        'grant_type': 'str',
+        }
+
+    clean_payload = sanitize(payload, client_credentials_payload_schema, playload_mapping)
+
+    try:
+        # TODO: Consider if there should be more checks for this service
+        AUTH_SERVICE = os.getenv('AUTH_SERVICE')
+        url = f'http://{AUTH_SERVICE}/auth/authorize/client'
+        headers = {'Content-Type': 'application/json'}
+        body = json.dumps(clean_payload)
+
+        response = requests.post(url=url, data=body, headers=headers)
+
+        if response.status_code != 200:
+            return False
+
+        return True
+
+    except AuthenticationError:
+        return False
+
 def create_session(payload: dict):
     if client_is_authenticated(payload):
+        print('Creating session...')
         response = aloe.create_session()
         if response != {}:
             try:
@@ -111,30 +136,44 @@ def validate_session(payload: dict):
     clean_payload = sanitize(payload, session_payload_schema, playload_mapping)
     try:
         response = aloe.validate_session(clean_payload['session_id'])
+        if not response:
+            return False
         return response['valid']
     except AuthenticationError:
         return False
 
-def client_is_authenticated(payload: dict):
-    playload_mapping = {
-        'id': 'str',
-        'username': 'str',
-        'password': 'str',
-        'grant_type': 'str',
-        }
-
-    clean_payload = sanitize(payload, client_credentials_payload_schema, playload_mapping)
-
+def authenticate_user_account(payload: dict):
     try:
-        # TODO: Consider if there should be more checks for this service
-        AUTH_SERVICE = os.getenv('AUTH_SERVICE')
-        auth_service = f'http://{AUTH_SERVICE}/auth/authorize/client'
-        
-        headers = {'Content-Type': 'application/json'}
+        session_payload = {'session_id': payload.get('session_id', None)}
+        if validate_session(session_payload):
+            # The sanitizing logic below is redundate to validate_session logic, but 
+            # generally do not want to pass direct user inputs to DB.
+            session_playload_mapping = {'session_id': 'str'}
+            clean_session_payload = sanitize(session_payload, session_payload_schema, session_playload_mapping)
+            session_state_response = aloe.get_session_state(clean_session_payload['session_id'])
+            payload.update(session_state_response)
+            playload_mapping = {
+                'client_id': 'str',
+                'state': 'str',
+                'response_type': 'str',
+                'scope': 'str',
+                # 'code_challenge': 'str',
+                # 'code_challenge_method': 'str',
+                'email': 'str',
+                'password': 'str',
+                'grant_type': 'str',
+            }
+            clean_payload = sanitize(payload, login_payload_schema, playload_mapping)
 
-        response = requests.post(url=auth_service, data=json.dumps(clean_payload), headers=headers)
-        if response.status_code != 200:
-            return False
-        return True
-    except AuthenticationError:
-        return False
+            AUTH_SERVICE = os.getenv('AUTH_SERVICE')
+            url = f'http://{AUTH_SERVICE}/auth/authorize/user'
+            headers = {'Content-Type': 'application/json'}
+            body = json.dumps(clean_payload)
+            response = requests.post(url=url, data=body, headers=headers)
+            if response.status_code != 200:
+                raise AuthenticationError
+            data = response.json()
+            return data
+        raise AuthenticationError
+    except (KeyError, AuthenticationError):
+        raise AuthenticationError

@@ -4,6 +4,7 @@ Routes at the auth url prefix are dedicated to communication with the Authentica
 from flask import Blueprint, request
 from services.auth import (
     authenticate_with_auth_server,
+    authenticate_user_account,
     exchange_code_for_tokens,
     create_session,
     validate_session,
@@ -25,35 +26,49 @@ auth_cors_config = {
 @auth.route('/login', methods=['POST'])
 def login():
     """
-    The entry point for clients to login and authenticate with the Authentication Service.
+    The entry point for user account login and authenticatation with the Authentication Service.
 
     Clients are responsible for providing the following:
         - Client ID:
             The client ID of the Authentication Service
         - Client Secret:
             A secret, provided by the Authentication Service
-        - State:
-            A value which will be echoed by the Authentication Service in all requests.
-            This value should be stored in a secure HttpOnly cookie.
+        - Session Id:
+            The id of the current session. The session will be validated first, then
+            the state will be extracted and sent to the authentication service, which
+            will echo back the value.
+
+        TODO: Implement the following?
         - Code Challenge:
             A value which will be collected and stored by the Authentication Service to
             validate subsequent request from a given client.
-            This value should be stored in a secure HttpOnly cookie.
-
     """
-    try:
-        # Any failure here raises an AuthenticationError
-        response = authenticate_with_auth_server(request)
-        if response.status_code == 200:
-            data = response.json()
-            return {'code': 200, 'data': data}
+    # try:
+    #     # Any failure here raises an AuthenticationError
+    #     response = authenticate_with_auth_server(request)
+    #     if response.status_code == 200:
+    #         data = response.json()
+    #         return {'code': 200, 'data': data}
 
+    # except AuthenticationError:
+    #     return {
+    #         'code': 405,
+    #         'data': {
+    #             'status': 'Failed',
+    #             'message': 'Unable to process authorization request',
+    #         }
+    #     }
+    try:
+        data = request.get_json()
+        auth_data = authenticate_user_account(data)
+        return {'code': 200, 'data': auth_data} # {code: ... state: ...}
+    
     except AuthenticationError:
         return {
-            'code': 405,
+            'code': 400,
             'data': {
                 'status': 'Failed',
-                'message': 'Unable to process authorization request',
+                'message': 'Unable to process authentication request'
             }
         }
 
@@ -132,7 +147,7 @@ def session_create():
             }
         }
 
-@auth.route('/session/validate', methods=['POST'])
+@auth.route('/session/introspect', methods=['POST'])
 def session_validate():
     try:
         data = request.get_json()

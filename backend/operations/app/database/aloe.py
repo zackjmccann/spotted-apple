@@ -49,7 +49,17 @@ class Aloe(Postgres):
 
     def validate_session(self, session_id) -> dict:
         query_data = {
-            'text': 'select * from validate_client_session(%(session_id)s) as valid;',
+            'text': 'SELECT * FROM validate_client_session(%(session_id)s) AS valid;',
+            'values': {'session_id': session_id}
+        }
+        return self.execute_query(
+            query_data=query_data,
+            return_method='fetchone',
+            cursor_type='RealDictCursor')
+
+    def get_session_state(self, session_id) -> dict:
+        query_data = {
+            'text': 'SELECT session_state AS state FROM get_client_session_state(%(session_id)s);',
             'values': {'session_id': session_id}
         }
         return self.execute_query(
