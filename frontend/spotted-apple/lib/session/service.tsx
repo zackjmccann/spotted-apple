@@ -24,9 +24,9 @@ export async function getSession(): Promise<Session | undefined> {
         password: process.env.CLIENT_PASSWORD,
         grant_type: 'client_credentials'
     });
-
+    
     let session: Session | undefined
-
+    
     try {
         const response = await fetch(url, options)
         
@@ -35,9 +35,7 @@ export async function getSession(): Promise<Session | undefined> {
         } else {
             const data = await response.json()
             session = {
-                id: data['id'],
-                state: data['state'],
-                created: new Date(data['created']),
+                token: data['token'],
                 expires: new Date(data['expires'])
             }
         }
@@ -49,7 +47,7 @@ export async function getSession(): Promise<Session | undefined> {
     return session
 };
 
-export async function validateSession(sessionId: string | undefined): Promise<boolean | undefined> { 
+export async function validateSession(session: string | undefined): Promise<boolean | undefined> { 
     const method = 'POST'
     const endpoint = '/auth/session/introspect'
     const url = `${process.env.OPS_SERVER}${endpoint}`
@@ -59,8 +57,8 @@ export async function validateSession(sessionId: string | undefined): Promise<bo
         credentials: 'include'
     }
 
-    options.body = JSON.stringify({ session_id: sessionId });
-    
+    options.body = JSON.stringify({ session: session, client_id: process.env.CLIENT_ID });
+
     let sessionIsValid: boolean
 
     try {

@@ -5,7 +5,7 @@ import datetime
 from distutils.util import strtobool
 from models.client_credentials import client_credentials_payload_schema
 from models.login import login_payload_schema
-from models.url_parameters import url_parameters_schema
+from models.auth_code_exchange import auth_code_exchange_payload_schema
 from utilities.payload_handlers import sanitize
 from jsonschema import ValidationError
 from database import aloe
@@ -21,7 +21,7 @@ class AuthenticationError(Exception):
 if None in [SECRET_KEY, ALOGRITHMS, APP_ID]:
     raise AuthenticationError('An authentication failure occurred')
 
-def authenticate(payload):
+def authenticate_client(payload):
     try:
         playload_mapping = {'id': 'str', 'username': 'str', 'password': 'str', 'grant_type': 'str'}
         clean_payload = sanitize(payload, client_credentials_payload_schema, playload_mapping)
@@ -35,14 +35,68 @@ def authenticate(payload):
     except (ValidationError, ValueError, KeyError):
         raise AuthenticationError
 
+def get_authorization_code(payload):
+    try:
+        playload_mapping = {
+            'client_id': 'str',
+            'state': 'str',
+            'response_type': 'str',
+            'scope': 'str',
+            # 'code_challenge': 'str',
+            # 'code_challenge_method': 'str',
+            'email': 'str',
+            'password': 'str',
+            'grant_type': 'str',
+        }
+        clean_payload = sanitize(payload, login_payload_schema, playload_mapping)
+        response = aloe.authenticate_user({
+            'email': clean_payload.get('email', ''),
+            'password': clean_payload.get('password', ''),
+        })
+        
+        if response['valid']:
+            authorization_code = generate_authorization_code()
+        return authorization_code
+
+    except (KeyError, ValidationError):
+        raise AuthenticationError
+
+def generate_authorization_code():
+    response = aloe.issue_authorization_code()
+    return response['auth_code']
+
+def exchange_auth_code_for_tokens(payload: dict):
+    try:
+        playload_mapping = {
+                'client_id': 'str',
+                'state': 'str',
+                # 'client_secret': 'str',
+                'code': 'str',
+                'grant_type': 'str',
+            }
+        clean_payload = sanitize(payload, auth_code_exchange_payload_schema, playload_mapping)
+        response = aloe.validate_authorization_code(clean_payload.get('code', ''))
+        clean_payload.update(response)
+
+        if not response['valid']:
+            raise AuthenticationError
+
+        return clean_payload
+    except (ValidationError, ValueError, KeyError):
+        raise AuthenticationError
+
 def issue_token(username, id, exp=5):
     data = {
         'iss': 'spotted-apple-backend',
-        'aud': [str(id)],
+        # 'sub' user_id TODO: Try to implement this
+        'aud': [str(id)], # TODO: change to client_id
         'iat': datetime.datetime.now(datetime.timezone.utc),
         'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=exp),
         'jti': 'backend_services' + '_' + datetime.datetime.now().strftime('%Y%m%d_%H%M'),
-        'context': {'username': username, 'roles':['client']}
+        'context': {
+            'username': username,
+            'roles':['client']
+            }
         }
     return jwt.encode(data, SECRET_KEY, ALOGRITHMS)
 
@@ -134,44 +188,3 @@ def blacklist_token(token):
 
 def parse_token(token):
     return jwt.decode(token, SECRET_KEY, algorithms=[ALOGRITHMS], audience=APP_ID)
-
-def get_authorization_code(payload):
-    try:
-        playload_mapping = {
-            'client_id': 'str',
-            'state': 'str',
-            'response_type': 'str',
-            'scope': 'str',
-            # 'code_challenge': 'str',
-            # 'code_challenge_method': 'str',
-            'email': 'str',
-            'password': 'str',
-            'grant_type': 'str',
-        }
-        clean_payload = sanitize(payload, login_payload_schema, playload_mapping)
-        response = aloe.authenticate_user({
-            'email': clean_payload.get('email', ''),
-            'password': clean_payload.get('password', ''),
-        })
-        
-        if response['valid']:
-            authorization_code = generate_authorization_code()
-        return authorization_code
-
-    except (KeyError, ValidationError):
-        raise AuthenticationError
-
-def validate_request_parameters(parameters):
-    CLIENT_ID = os.getenv('CLIENT_ID')
-    REGISTERED_REDIRECT_URLS = json.loads(os.environ['REGISTERED_REDIRECT_URLS'])
-
-    try:
-        assert parameters['client_id'] == CLIENT_ID
-        assert parameters['redirect_uri'] in REGISTERED_REDIRECT_URLS
-        return True
-    except AssertionError:
-        return False
-
-def generate_authorization_code():
-    response = aloe.issue_authorization_code()
-    return response['auth_code']

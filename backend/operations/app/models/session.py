@@ -3,7 +3,8 @@ session_payload_schema = {
     'description': 'Expected payload for a session validation request',
     'type': 'object',
     'properties': {
-        'session_id': { 'type': 'string', 'minLength': 1 },
+        'session': { 'type': 'string', 'minLength': 1 },
+        'client_id': { 'type': 'string', 'minLength': 1 },
     },
-    'required': ['session_id'],
+    'required': ['session', 'client_id'],
 }

@@ -149,3 +149,13 @@ class Aloe(Postgres):
             query_data=query_data,
             return_method='fetchone',
             cursor_type='RealDictCursor')
+
+    def validate_authorization_code(self, auth_code: str) -> dict:
+        query_data = {
+            'text': 'SELECT * FROM validate_oauth_authorization_code(%(auth_code)s) AS valid;',
+            'values': {'auth_code': auth_code}
+        }
+        return self.execute_query(
+            query_data=query_data,
+            return_method='fetchone',
+            cursor_type='RealDictCursor')

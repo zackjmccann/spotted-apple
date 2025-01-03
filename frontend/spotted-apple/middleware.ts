@@ -6,13 +6,13 @@ import { checkForCookie, getCookie } from '@/lib/cookies'
 export async function middleware() {
     let validSession: boolean;
     
-    const hasSessionId = await checkForCookie('sessionId')
+    const hasSession = await checkForCookie('session')
     
-    if (!hasSessionId) {
+    if (!hasSession) {
         validSession = false
     } else {
-        const sessionId = await getCookie('sessionId')
-        validSession = await validateSession(sessionId) ?? false
+        const session = await getCookie('session')
+        validSession = await validateSession(session) ?? false
     }
     
     if (validSession) {
@@ -24,7 +24,7 @@ export async function middleware() {
             const response = NextResponse.next()
 
             if (session) {
-                response.cookies.set({ name: 'sessionId', value: session.id, expires: session.expires})
+                response.cookies.set({ name: 'session', value: session.token, expires: session.expires})
                 return response
 
             } else {

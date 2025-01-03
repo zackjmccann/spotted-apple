@@ -3,13 +3,13 @@
 import logger from '@/lib/logging'
 import { ClientCredentials, RequestParameters, AccountCreationData } from '@/data-access/auth/types'
 import { setCookie, getCookie, checkForCookie, Cookie } from '@/lib/cookies'
-import { authFetch } from '@/data-access/auth'
+import { opsFetch } from '@/data-access/auth'
 
 
 const clientCredentials: ClientCredentials = {
     username: process.env.CLIENT_USERNAME,
     password: process.env.CLIENT_PASSWORD,
-    appId: parseInt(process.env.APP_ID),
+    appId: parseInt(process.env.CLIENT_ID),
 }
 
 async function authenticateWithBackend() {
@@ -26,7 +26,7 @@ async function authenticateWithBackend() {
     }
 
     try {
-        const response = await authFetch(authRequest);    
+        const response = await opsFetch(authRequest);    
         const data = await response.json()
         
         if (!response.ok) {
@@ -49,7 +49,7 @@ async function refreshTokens(refreshToken: string) {
     }
 
     try {
-        const response = await authFetch(authRequest);      
+        const response = await opsFetch(authRequest);      
         const data = await response.json()
         
         if (!response.ok) {
@@ -87,11 +87,11 @@ async function setAuthenticationCookies(authData: Record<string, string>) {
 }
 
 export async function getAccessToken() {
-    const hasAccessToken = await checkForCookie('access_token')
-    const hasRefreshToken = await checkForCookie('refresh_token')
+    const hasAccessToken = await checkForCookie('accessToken')
+    const hasRefreshToken = await checkForCookie('refreshToken')
 
     if (!hasAccessToken && hasRefreshToken) {
-        const refreshTokenValue = await getCookie('refresh_token')
+        const refreshTokenValue = await getCookie('refreshToken') ?? ''
         const tokenRefreshResponseData = await refreshTokens(refreshTokenValue)
         await setAuthenticationCookies(tokenRefreshResponseData)
     } else if (!hasAccessToken) {
@@ -112,7 +112,7 @@ export async function checkIfEmailExists(email: string): Promise<boolean | null>
     }
     
     try {
-        const response = await authFetch(requestdata)
+        const response = await opsFetch(requestdata)
         try {
             const data = await response!.json()
             emailExists = data['registered']
@@ -141,7 +141,7 @@ export async function createAccount({email, password, firstName, lastName}: Acco
     }
 
     try {
-        const response = await authFetch(requestdata)
+        const response = await opsFetch(requestdata)
         try {
             const userData = await response!.json()
             await setAuthenticationCookies(userData)

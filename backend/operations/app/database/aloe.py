@@ -37,10 +37,10 @@ class Aloe(Postgres):
         
         return result
 
-    def create_session(self) -> dict:
+    def create_session(self, client_id: str) -> dict:
         query_data = {
-            'text': f'SELECT session_id, session_state, created_at, expires_at FROM create_client_app_session();',
-            'values': {}
+            'text': 'SELECT * FROM create_client_app_session(%(client_id)s);',
+            'values': {'client_id': client_id}
         }
         return self.execute_query(
             query_data=query_data,

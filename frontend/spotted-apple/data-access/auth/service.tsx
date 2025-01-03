@@ -29,32 +29,31 @@ function getUrlParams(urlParameterMappings: Record<string, any>): string {
  * compiles these common/standard parameters.
  * @returns {Record<string, string>}
  */
-async function getAuthenticationQueryParameters(): Promise<Record<string, string>> {
-  const sessionId = await getCookie('sessionId')
+async function getAuthenticationParameters(): Promise<Record<string, string>> {
+  const session = await getCookie('session')
     return {
-        client_id: process.env.AUTH_CLIENT_ID,
+        client_id: process.env.CLIENT_ID,
+        auth_client_id: process.env.AUTH_CLIENT_ID,
         response_type: 'code',
-        session_id: sessionId ?? '',
+        session: session ?? '',
         scope: 'profile offline_access openid',
         // code_challenge_method: 'S256',
     }
 }
 
 /**
- * Fetch Wrapper class specifically for interacting with the Authentication Service
+ * Fetch Wrapper class specifically for interacting with the Operations Service
  * @param requestParameters 
  */
-export async function authFetch({
+export async function opsFetch({
     method,
     endpoint,
     // queryParameters,
     body,
     headers,
 }: RequestParameters): Promise<Response> {
-    const authQueryParameters = await getAuthenticationQueryParameters()
-    // const query = {...authQueryParameters, ...queryParameters}
-    // const url = `${process.env.AUTH_SERVER}${endpoint}?${getUrlParams(query)}`
-    const payload = {...authQueryParameters, ...body}
+    const authParameters = await getAuthenticationParameters()
+    const payload = {...authParameters, ...body}
     const url = `${process.env.OPS_SERVER}${endpoint}`
     const options: RequestInit = {
         method,

@@ -2,10 +2,10 @@
 
 import logger from '@/lib/logging'
 import { LoginFormSchema } from '@/features/login/schemas'
-import { LoginState } from '@/features/login/types'
-import { authFetch, RequestParameters } from '@/data-access/auth'
+import { LoginState, AccessTokens } from '@/features/login/types'
+import { opsFetch, RequestParameters } from '@/data-access/auth'
 import { getCookie, setCookie, Cookie } from '@/lib/cookies'
-import { randomBytes } from 'crypto'
+// import { randomBytes } from 'crypto'
 import { redirect } from 'next/navigation'
 
 
@@ -26,17 +26,8 @@ export async function login(prevState: LoginState, formData: FormData,) {
         return { errors: formErrors, formData: enteredValues};
     };
     
-    // Login logic
-    let redirectUrl: string
-    
-    // State and code challenges are required for identity authentication requests
-    // and must be presevered for subsequent requests. For login authentication
-    // requests, 'state' and 'code_challenge' cookies are set.
-    // const state = randomBytes(64).toString('hex')
-    // const codeChallenge = randomBytes(64).toString('hex')
-    // await setCookie({name: 'state', value: state, maxAge: 60} as Cookie)
-    // await setCookie({name: 'code_challenge', value: codeChallenge, maxAge: 60} as Cookie)
-    
+    let redirectUrl: string = process.env.ORIGIN
+
     const { email, password } = enteredValues;
     const authRequest: RequestParameters = {
         method: 'POST',
@@ -47,26 +38,75 @@ export async function login(prevState: LoginState, formData: FormData,) {
             grant_type: 'authorization',
         },
     }
-
-    try {
-        const response = await authFetch(authRequest);    
-
-        if (!response.ok) {
-            const data = await response.json()
-            throw new Error(`${data.message}`)
-        } else {
-            logger.debug('Authentication request successful.')
-            const data = await response.json()
-            const code = data['code']
-            
-            logger.info(`Auth Code: ${code}`)
-            redirectUrl = 'http://localhost:3000/profile'
+    
+    const authCode = await getAuthorizationCode(authRequest); 
+    
+    if (authCode) {
+        const tokenRequest: RequestParameters = {
+            method: 'POST',
+            endpoint: '/auth/token/exchange',
+            body: { code: authCode, grant_type: 'authentication_code' },
         }
-    } catch (error) {
-        const err = error instanceof Error ? error.message : String(error)
-        logger.error(`Authentication Request Failed: ${err}`);
-        redirectUrl = 'http://localhost:3000/test'
+        
+        const tokens = await getAccessTokens(tokenRequest); 
+        
+        if (tokens) {
+            setCookie({name: 'idToken', value: tokens.idToken} as Cookie)
+            setCookie({name: 'acccessToken', value: tokens.accessToken} as Cookie)
+            setCookie({name: 'refreshToken', value: tokens.refreshToken} as Cookie)
+            redirectUrl = `${redirectUrl}/profile`
+
+        } else {
+            logger.error(`Authentication Request Failed: No tokens received.`);
+            redirectUrl = redirectUrl = `${redirectUrl}/test`
+        }
+
+    } else {
+        logger.error(`Authentication Request Failed: No auth code received.`);
+        redirectUrl = redirectUrl = `${redirectUrl}/test`
     }
 
     redirect(redirectUrl);
 };
+
+
+async function getAuthorizationCode(authRequest: RequestParameters): Promise<string | undefined> {
+    try {
+        const response = await opsFetch(authRequest);    
+        if (!response.ok) {
+            const data = await response.json()
+            throw new Error(`${data.message}`)
+
+        } else {
+            const data = await response.json()            
+            return data['code']
+        }
+    } catch (error) {
+        const err = error instanceof Error ? error.message : String(error)
+        logger.error(`Authentication Request Failed: ${err}`);
+        return undefined
+    }
+}
+
+async function getAccessTokens(tokenRequest: RequestParameters): Promise<AccessTokens | undefined> {
+    try {
+        const response = await opsFetch(tokenRequest);    
+        if (!response.ok) {
+            const data = await response.json()
+            throw new Error(`${data.message}`)
+    
+        } else {
+            const data = await response.json()
+            return {
+                idToken: data.id_token,
+                accessToken: data.access_token,
+                refreshToken: data.refresh_token,
+            } as AccessTokens
+        }
+
+    } catch (error) {
+        const err = error instanceof Error ? error.message : String(error)
+        logger.error(`Authentication Request Failed: ${err}`);
+        return undefined
+    }
+}

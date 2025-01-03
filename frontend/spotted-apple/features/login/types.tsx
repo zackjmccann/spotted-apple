@@ -6,7 +6,12 @@ export type LoginState = {
 }
 
 export type LoginProps = {
-state: LoginState;
-action: FormAction;
+    state: LoginState;
+    action: FormAction;
 }
 
+export type AccessTokens = {
+    idToken: string,
+    accessToken: string,
+    refreshToken: string,
+}
