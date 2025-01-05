@@ -10,7 +10,10 @@ from ops_logging import logger
 def create_app(config='config.settings'):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(config)
-    app.response_class = BackendResponse
+    
+    if not app.config.get('TESTING', False):
+        pass
+        # app.response_class = BackendResponse
 
     try:
         os.makedirs(app.instance_path)
