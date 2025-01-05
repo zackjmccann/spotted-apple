@@ -1,4 +1,7 @@
+import jsonschema
 from jsonschema import validate
+from datetime import datetime
+
 
 def sanitize(payload, schema, type_casting=None):
     validate(instance=payload, schema=schema)
@@ -32,3 +35,13 @@ def check_for_dangerous_characters(payload):
             for character in forbidden_characters:
                 if character in payload[field]:
                     raise ValueError('Payload contains forbidden character')
+
+def validate_with_datetime(schema, instance):
+    BaseVal = jsonschema.Draft7Validator
+    
+    def is_datetime(checker, inst):
+        return isinstance(inst, datetime)
+
+    date_check = BaseVal.TYPE_CHECKER.redefine('datetime', is_datetime)
+    Validator = jsonschema.validators.extend(BaseVal, type_checker=date_check)
+    Validator(schema=schema).validate(instance)
