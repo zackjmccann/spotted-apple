@@ -9,7 +9,6 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 
 export default function SetPasswordForm({state, action}: SignUpProps) {
-    // TODO: Display one error message at the bottom, not per field
     const initialErrorState: InputFieldErrorState = {email: true, password: true, confirmPassword: true};
     const [intputState, setInput] = useState(state.formData);
     const [errorState, displayError] = useState(initialErrorState) 

@@ -18,7 +18,6 @@ api_cors_config = {
 def check_email():
     try:
         # UnsupportedMediaType is raised if request content type is not 'application/json'
-        print(f'Req Auth 2: {str(request.authorization)[-10:]}')
         data = request.get_json()
         email = data.get('email', None)
         assert email is not None

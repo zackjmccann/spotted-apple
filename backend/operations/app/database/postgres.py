@@ -34,13 +34,13 @@ class Postgres:
             else:
                 cursor = conn.cursor()
 
-            try:
-                cursor.execute(query_data['text'], query_data['values'])
-                conn.commit()
-                result = getattr(cursor, return_method)()
-                cursor.close()
-                return result
+            # try:
+            cursor.execute(query_data['text'], query_data['values'])
+            conn.commit()
+            result = getattr(cursor, return_method)()
+            cursor.close()
+            return result
 
-            except Error as e:
-                cursor.close()
-                return e
+            # except Error as e:
+            #     cursor.close()
+            #     return e

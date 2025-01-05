@@ -1,0 +1,27 @@
+login_payload_schema = {
+    'title' : 'Credential Based Login Authentication Request',
+    'description': 'Expected payload for an login request',
+    'type': 'object',
+    'properties': {
+        'client_id': { 'type': 'string', 'minLength': 1 },
+        'client_secret': { 'type': 'string', 'minLength': 1 },
+        'session': { 'type': 'string', 'minLength': 1 },
+        'email': { 'type': 'string', 'minLength': 1 },
+        'password': { 'type': 'string', 'minLength': 1 },
+        'grant_type': { 'type': 'string', 'pattern': '^authorization$' },
+        # 'state': { 'type': 'string', 'minLength': 1 },
+        # 'response_type': { 'type': 'string', 'pattern': '^code$' },
+        # 'scope': { 'type': 'string', 'minLength': 1 },
+        # 'code_challenge': { 'type': 'string', 'minLength': 1 },
+        # 'code_challenge_method': { 'type': 'string', 'pattern': '^S256$' },
+    },
+    'required': [
+        'client_id',
+        'client_secret',
+        'session',
+        'email',
+        'password',
+        'grant_type',
+        ],
+    # 'required': [ 'client_id', 'state', 'response_type', 'scope', # 'code_challenge', # 'code_challenge_method', 'email', 'password', 'grant_type', ],
+}

@@ -1,8 +1,11 @@
 import os
 import jwt
+import json
 import datetime
 from distutils.util import strtobool
-from models.credentials import credentials_payload_schema
+from models.client_credentials import client_credentials_payload_schema
+from models.login import login_payload_schema
+from models.auth_code_exchange import auth_code_payload_schema
 from utilities.payload_handlers import sanitize
 from jsonschema import ValidationError
 from database import aloe
@@ -18,37 +21,85 @@ class AuthenticationError(Exception):
 if None in [SECRET_KEY, ALOGRITHMS, APP_ID]:
     raise AuthenticationError('An authentication failure occurred')
 
-def authenticate(payload):
+def authenticate_client(payload):
     try:
-        playload_mapping = {'username': 'str', 'password': 'str', 'id': 'int', 'grant_type': 'str'}
-        clean_payload = sanitize(payload, credentials_payload_schema, playload_mapping)
+        playload_mapping = {'client_id': 'str', 'username': 'str', 'secret': 'str', 'grant_type': 'str'}
+        clean_payload = sanitize(payload, client_credentials_payload_schema, playload_mapping)
         response = aloe.authenticate_client(clean_payload)
         clean_payload.update(response)
 
         if not response['valid']:
-            response.update({
-                'code': 401,
-                'status': 'Authentication Failed',
-                'message': 'Unable to authenticate',
-            })
+            raise AuthenticationError
 
         return clean_payload
     except (ValidationError, ValueError, KeyError):
-        return {
-            'code': 401,
-            'valid': False,
-            'status': 'Authentication Failed',
-            'message': 'Unable to authenticate',
+        raise AuthenticationError
+
+def get_authorization_code(payload):
+    try:
+        playload_mapping = {
+            'client_id': 'str',
+            'client_secret': 'str',
+            'state': 'str',
+            'response_type': 'str',
+            'scope': 'str',
+            # 'code_challenge': 'str',
+            # 'code_challenge_method': 'str',
+            'email': 'str',
+            'password': 'str',
+            'grant_type': 'str',
+        }
+        clean_payload = sanitize(payload, login_payload_schema, playload_mapping)
+        response = aloe.authenticate_user({
+            'email': clean_payload.get('email', ''),
+            'password': clean_payload.get('password', ''),
+        })
+        
+        if response['valid']:
+            authorization_code = generate_authorization_code()
+        return authorization_code
+
+    except (KeyError, ValidationError):
+        raise AuthenticationError
+
+def generate_authorization_code():
+    response = aloe.issue_authorization_code()
+    return response['auth_code']
+
+def exchange_auth_code_for_tokens(payload: dict):
+    try:
+        playload_mapping = {
+                'client_id': 'str',
+                'state': 'str',
+                'client_secret': 'str',
+                'code': 'str',
+                'grant_type': 'str',
+                'response_type': 'str',
+                'scope': 'str',
             }
+        clean_payload = sanitize(payload, auth_code_payload_schema, playload_mapping)
+        response = aloe.validate_authorization_code(clean_payload.get('code', ''))
+        clean_payload.update(response)
+
+        if not response['valid']:
+            raise AuthenticationError
+
+        return clean_payload
+    except (ValidationError, ValueError, KeyError):
+        raise AuthenticationError
 
 def issue_token(username, id, exp=5):
     data = {
         'iss': 'spotted-apple-backend',
-        'aud': [str(id)],
+        # 'sub' user_id TODO: Try to implement this
+        'aud': [str(id)], # TODO: change to client_id
         'iat': datetime.datetime.now(datetime.timezone.utc),
         'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=exp),
         'jti': 'backend_services' + '_' + datetime.datetime.now().strftime('%Y%m%d_%H%M'),
-        'context': {'username': username, 'roles':['client']}
+        'context': {
+            'username': username,
+            'roles':['client']
+            }
         }
     return jwt.encode(data, SECRET_KEY, ALOGRITHMS)
 
@@ -64,6 +115,7 @@ def validate_token(token):
     try:
         assert not is_blacklisted_token(token)
         data = jwt.decode(token, SECRET_KEY, algorithms=[ALOGRITHMS], audience=APP_ID)
+        # TODO: Test GRANTED_APP_IDS = json.loads(os.environ['GRANTED_APP_IDS'])
         # for aud in data['aud']:
         #     assert aud in GRANTED_APP_IDS
 

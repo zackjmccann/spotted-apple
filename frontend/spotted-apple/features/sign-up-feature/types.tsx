@@ -1,3 +1,5 @@
+import { FormAction } from '@/lib/forms/types'
+
 export type AccountData = {
   email: string,
   firstName: string,
@@ -11,8 +13,6 @@ export type SignUpState = {
     formData?: Record<string, string>;
     accountData?: AccountData;
   }
-
-export type FormAction = (payload: FormData) => void;
 
 export type SignUpProps = {
   state: SignUpState;
