@@ -1,7 +1,7 @@
 """
 A class representing an instance of the Spotted Apple Database "Aloe"
 """
-from auth_logging import logger
+from logging import logger
 from app.database.postgres import Postgres
 from psycopg2 import errors
 

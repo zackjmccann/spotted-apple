@@ -3,15 +3,12 @@ from flask import Flask
 from flask_cors import CORS
 from database import aloe
 from routes import blueprints
-from middleware import Authenticator
-from utilities import BackendResponse
-from auth_logging import logger
+from logging import logger
 
 
 def create_app(config='config.settings'):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(config)
-    app.response_class = BackendResponse
 
     try:
         os.makedirs(app.instance_path)

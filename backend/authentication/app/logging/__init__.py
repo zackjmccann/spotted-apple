@@ -9,7 +9,7 @@ def get_log_level():
     else:
         return logging.INFO
 
-logger = logging.getLogger('auth_logger')
+logger = logging.getLogger(__name__)
 
 
 logging.basicConfig(
