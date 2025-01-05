@@ -3,7 +3,7 @@ client_credentials_payload_schema = {
     'description': 'Expected payload for an authentication request to create a session',
     'type': 'object',
     'properties': {
-        'id': {
+        'client_id': {
             'type': 'string',
             'minLength': 1
             },
@@ -11,7 +11,7 @@ client_credentials_payload_schema = {
             'type': 'string',
             'minLength': 1
             },
-        'password': {
+        'secret': {
             'type': 'string',
             'minLength': 1
             },
@@ -20,7 +20,7 @@ client_credentials_payload_schema = {
             'pattern': '^client_credentials$'
             },
     },
-    'required': ['id', 'username', 'password', 'grant_type'],
+    'required': ['client_id', 'username', 'secret', 'grant_type'],
 }
 
 client_id_payload_schema = {
@@ -28,7 +28,7 @@ client_id_payload_schema = {
     'description': 'Expected payload for a client id',
     'type': 'object',
     'properties': {
-        'id': { 'type': 'string', 'minLength': 1 },
+        'client_id': { 'type': 'string', 'minLength': 1 },
     },
-    'required': ['id'],
+    'required': ['client_id'],
 }
