@@ -36,6 +36,7 @@ export async function login(prevState: LoginState, formData: FormData,) {
             email: email,
             password: password,
             grant_type: 'authorization',
+            response_type: 'code',
         },
     }
     
@@ -45,7 +46,10 @@ export async function login(prevState: LoginState, formData: FormData,) {
         const tokenRequest: RequestParameters = {
             method: 'POST',
             endpoint: '/auth/token/exchange',
-            body: { code: authCode, grant_type: 'authentication_code' },
+            body: {
+                code: authCode,
+                grant_type: 'authentication_code',
+            },
         }
         
         const tokens = await getAccessTokens(tokenRequest); 

@@ -5,7 +5,7 @@ login_payload_schema = {
     'properties': {
         'client_id': { 'type': 'string', 'minLength': 1 },
         'client_secret': { 'type': 'string', 'minLength': 1 },
-        'state': { 'type': 'string', 'minLength': 1 },
+        'session': { 'type': 'string', 'minLength': 1 },
         'email': { 'type': 'string', 'minLength': 1 },
         'password': { 'type': 'string', 'minLength': 1 },
         'grant_type': { 'type': 'string', 'pattern': '^authorization$' },
@@ -18,7 +18,7 @@ login_payload_schema = {
     'required': [
         'client_id',
         'client_secret',
-        'state',
+        'session',
         'email',
         'password',
         'grant_type',

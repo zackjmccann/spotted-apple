@@ -11,7 +11,7 @@ from models import (
 from jsonschema import ValidationError
 from utilities.payload_handlers import sanitize
 from app.services import BaseService
-
+from ops_logging import logger
 
 class AuthenticationError(Exception):
     pass
@@ -123,7 +123,7 @@ class AuthService(BaseService):
             playload_mapping = {
                 'client_id': 'str',
                 'client_secret': 'str',
-                'state': 'str',
+                'session': 'str',
                 'email': 'str',
                 'password': 'str',
                 'grant_type': 'str',
@@ -134,7 +134,7 @@ class AuthService(BaseService):
             playload_mapping = {
                 'client_id': 'str',
                 'client_secret': 'str',
-                'state': 'str',
+                'session': 'str',
                 'code': 'str',
                 'grant_type': 'str',
                 }

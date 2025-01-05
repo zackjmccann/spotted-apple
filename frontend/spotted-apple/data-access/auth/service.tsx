@@ -33,8 +33,7 @@ async function getAuthenticationParameters(): Promise<Record<string, string>> {
   const session = await getCookie('session')
     return {
         client_id: process.env.CLIENT_ID,
-        auth_client_id: process.env.AUTH_CLIENT_ID,
-        response_type: 'code',
+        client_secret: process.env.CLIENT_SECRET,
         session: session ?? '',
         scope: 'profile offline_access openid',
         // code_challenge_method: 'S256',

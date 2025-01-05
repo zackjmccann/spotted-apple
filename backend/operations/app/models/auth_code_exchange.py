@@ -5,9 +5,9 @@ auth_code_payload_schema = {
     'properties': {
         'client_id': { 'type': 'string', 'minLength': 1 },
         'client_secret': { 'type': 'string', 'minLength': 1 },
-        'state': { 'type': 'string', 'minLength': 1 },
+        'session': { 'type': 'string', 'minLength': 1 },
         'code': { 'type': 'string', 'minLength': 1 },
         'grant_type': { 'type': 'string', 'pattern': '^authentication_code$' },
     },
-    'required': ['client_id', 'client_secret', 'state', 'code', 'grant_type',],
+    'required': ['client_id', 'client_secret', 'session', 'code', 'grant_type',],
 }

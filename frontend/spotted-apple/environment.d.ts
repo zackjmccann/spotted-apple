@@ -6,7 +6,7 @@ declare global {
             ORIGIN: string;
             CLIENT_ID: string;
             CLIENT_USERNAME: string;
-            CLIENT_PASSWORD: string;
+            CLIENT_SECRET: string;
             
             AUTH_SERVER: string;
             AUTH_CLIENT_ID: string;

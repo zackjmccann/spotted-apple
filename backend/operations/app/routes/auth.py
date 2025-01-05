@@ -1,6 +1,7 @@
 """
 Routes at the auth url prefix are dedicated to communication with the Authentication Server
 """
+from ops_logging import logger
 from flask import Blueprint, request
 from services import (
     auth_service,
@@ -150,6 +151,7 @@ def login():
             raise AuthenticationError
 
         session_state = session_service.get_session_state(session_id)
+        del clean_payload['session']
         clean_payload.update({'state': session_state})
         auth_data = auth_service.authenticate_user_account(clean_payload)
         return auth_data, 200
@@ -184,6 +186,7 @@ def token():
     """
     try:
         data = request.get_json()
+        logger.debug(f'Raw Payload: {data}')
         clean_payload = auth_service.sanitize_payload(data, 'auth_code')
         session_token = clean_payload.get('session', None)
 

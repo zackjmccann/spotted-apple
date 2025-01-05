@@ -19,9 +19,9 @@ export async function getSession(): Promise<Session | undefined> {
     }
 
     options.body = JSON.stringify({
-        id: process.env.CLIENT_ID,
+        client_id: process.env.CLIENT_ID,
         username: process.env.CLIENT_USERNAME,
-        password: process.env.CLIENT_PASSWORD,
+        secret: process.env.CLIENT_SECRET,
         grant_type: 'client_credentials'
     });
     
@@ -35,7 +35,7 @@ export async function getSession(): Promise<Session | undefined> {
         } else {
             const data = await response.json()
             session = {
-                token: data['token'],
+                token: data['session'],
                 expires: new Date(data['expires'])
             }
         }
