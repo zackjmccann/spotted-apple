@@ -1,7 +1,9 @@
 """
 A class representing an instance of the Spotted Apple Database "Aloe"
 """
+from psycopg2 import Error
 from app.database.postgres import Postgres
+from ops_logging import logger
 
 
 class Aloe(Postgres):
@@ -47,22 +49,44 @@ class Aloe(Postgres):
             return_method='fetchone',
             cursor_type='RealDictCursor')
 
+    def revoke_session(self, session_id: str) -> dict:
+        query_data = {
+            'text': 'SELECT * FROM revoke_client_app_session(%(session_id)s) AS revoked;',
+            'values': {'session_id': session_id}
+        }
+        try:
+            return self.execute_query(
+            query_data=query_data,
+            return_method='fetchone',
+            cursor_type='RealDictCursor')
+        except Error as err:
+            logger.error(f'An error occurred at the database: {err}')
+            return False
+
     def validate_session(self, session_id) -> dict:
         query_data = {
             'text': 'SELECT * FROM validate_client_session(%(session_id)s) AS valid;',
             'values': {'session_id': session_id}
         }
-        return self.execute_query(
+        try:
+            return self.execute_query(
             query_data=query_data,
             return_method='fetchone',
             cursor_type='RealDictCursor')
+        except Error as err:
+            logger.error(f'An error occurred at the database: {err}')
+            return False
 
     def get_session_state(self, session_id) -> dict:
         query_data = {
-            'text': 'SELECT session_state AS state FROM get_client_session_state(%(session_id)s);',
+            'text': 'SELECT * FROM get_client_session_state(%(session_id)s) AS session_state;',
             'values': {'session_id': session_id}
         }
-        return self.execute_query(
+        try:
+            return self.execute_query(
             query_data=query_data,
             return_method='fetchone',
             cursor_type='RealDictCursor')
+        except Error as err:
+            logger.error(f'An error occurred at the database: {err}')
+            return False
