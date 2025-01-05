@@ -76,6 +76,7 @@ def get_token():
                 'id_token': test_token,
                 'access_token': test_token,
                 'refresh_token': test_token,
+                'state': response.get('state')
                 }
             }
     except (TypeError, KeyError, AuthenticationError):

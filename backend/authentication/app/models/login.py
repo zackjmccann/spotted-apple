@@ -4,6 +4,7 @@ login_payload_schema = {
     'type': 'object',
     'properties': {
         'client_id': { 'type': 'string', 'minLength': 1 },
+        'client_secret': { 'type': 'string', 'minLength': 1 },
         'state': { 'type': 'string', 'minLength': 1 },
         'response_type': { 'type': 'string', 'pattern': '^code$' },
         'scope': { 'type': 'string', 'minLength': 1 },
@@ -15,6 +16,7 @@ login_payload_schema = {
     },
     'required': [
         'client_id',
+        'client_secret',
         'state',
         'response_type',
         'scope',

@@ -5,7 +5,7 @@ import datetime
 from distutils.util import strtobool
 from models.client_credentials import client_credentials_payload_schema
 from models.login import login_payload_schema
-from models.auth_code_exchange import auth_code_exchange_payload_schema
+from models.auth_code_exchange import auth_code_payload_schema
 from utilities.payload_handlers import sanitize
 from jsonschema import ValidationError
 from database import aloe
@@ -23,7 +23,7 @@ if None in [SECRET_KEY, ALOGRITHMS, APP_ID]:
 
 def authenticate_client(payload):
     try:
-        playload_mapping = {'id': 'str', 'username': 'str', 'password': 'str', 'grant_type': 'str'}
+        playload_mapping = {'client_id': 'str', 'username': 'str', 'secret': 'str', 'grant_type': 'str'}
         clean_payload = sanitize(payload, client_credentials_payload_schema, playload_mapping)
         response = aloe.authenticate_client(clean_payload)
         clean_payload.update(response)
@@ -39,6 +39,7 @@ def get_authorization_code(payload):
     try:
         playload_mapping = {
             'client_id': 'str',
+            'client_secret': 'str',
             'state': 'str',
             'response_type': 'str',
             'scope': 'str',
@@ -70,11 +71,13 @@ def exchange_auth_code_for_tokens(payload: dict):
         playload_mapping = {
                 'client_id': 'str',
                 'state': 'str',
-                # 'client_secret': 'str',
+                'client_secret': 'str',
                 'code': 'str',
                 'grant_type': 'str',
+                'response_type': 'str',
+                'scope': 'str',
             }
-        clean_payload = sanitize(payload, auth_code_exchange_payload_schema, playload_mapping)
+        clean_payload = sanitize(payload, auth_code_payload_schema, playload_mapping)
         response = aloe.validate_authorization_code(clean_payload.get('code', ''))
         clean_payload.update(response)
 

@@ -60,11 +60,11 @@ class Aloe(Postgres):
 
     def authenticate_client(self, client_credentials):
         query_data = {
-            'text': 'SELECT authenticate_client(%(id)s, %(username)s, %(password)s) AS valid; ',
+            'text': 'SELECT authenticate_client(%(client_id)s, %(username)s, %(secret)s) AS valid; ',
             'values': {
-                'id': client_credentials['id'],
+                'client_id': client_credentials['client_id'],
                 'username': client_credentials['username'],
-                'password': client_credentials['password'],
+                'secret': client_credentials['secret'],
                 }
         }
         return self.execute_query(
