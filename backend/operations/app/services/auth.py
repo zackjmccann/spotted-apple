@@ -3,10 +3,13 @@ import jwt
 import json
 import requests
 import datetime
-from models.login import login_payload_schema
-from models.client_credentials import client_credentials_payload_schema, client_id_payload_schema
-from models.auth_code_exchange import auth_code_exchange_payload_schema
-from models.session import session_payload_schema
+from models import (
+    login_payload_schema,
+    client_credentials_payload_schema, 
+    client_id_payload_schema,
+    auth_code_payload_schema,
+    session_payload_schema,
+)
 from utilities.payload_handlers import sanitize
 from database import aloe
 
@@ -127,7 +130,7 @@ def exchange_authentication_code(payload: dict):
                 'code': 'str',
                 'grant_type': 'str',
             }
-            clean_payload = sanitize(payload, auth_code_exchange_payload_schema, playload_mapping)
+            clean_payload = sanitize(payload, auth_code_payload_schema, playload_mapping)
 
             AUTH_SERVICE = os.getenv('AUTH_SERVICE')
             url = f'http://{AUTH_SERVICE}/auth/token'
@@ -180,7 +183,6 @@ def issue_session_token(session_data: dict):
             }
         }
     return jwt.encode(data, SECRET_KEY, ALOGRITHMS)
-
 
 def validate_token(payload):
     token = payload.get('session', '')
