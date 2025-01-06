@@ -9,9 +9,32 @@ TODO:
  2. Similar to the Ops server, authenticate a service, and ensure it
     presents the JWT in the Authorization header each time.
 """
-from logging import logger
+import json
+import logging
+from werkzeug.wrappers import Request, Response
 
-class Middleware(logger):
-    def access(self, resp, req, environ, request_time):
-            logger = self.access_log
-            logger.info(f'[{request_time}] {req.method} - {req.path}: {resp.status}')
+
+class Middleware:
+   def __init__(self, wsgi_app):
+      self.wsgi_app = wsgi_app
+      self.logger = logging.getLogger(__name__)
+   
+   def __call__(self, environment, start_response):
+      request = Request(environment)
+
+      if request.path == '/auth/authenticate/service':
+         return self.wsgi_app(environment, start_response)
+
+      if 'Authorization' not in request.headers:
+         data = {'message': 'Authorization failed'}
+         res = self.get_response(data=data, status=400)
+         return res(environment, start_response)
+        
+      return self.wsgi_app(environment, start_response)
+
+   def get_response(self, **kwargs):
+      raw_data = kwargs.get('data', None)
+      data = json.dumps(raw_data)
+      content_type = kwargs.get('content_type', 'application/json')
+      status = kwargs.get('status', 500)
+      return Response(data, content_type=content_type, status=status)

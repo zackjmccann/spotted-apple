@@ -1,14 +1,44 @@
 """
 A class representing an instance of the Spotted Apple Database "Aloe"
 """
-from logging import logger
 from app.database.postgres import Postgres
 from psycopg2 import errors
 
+def init_app(app):
+    app.logger.debug('Initializing database...')
+    app.db = Aloe()
 
 class Aloe(Postgres):
     def __init__(self):
         super().__init__()
+
+    def authenticate_service(self, service_credentials):
+        query_data = {
+            'text': 'SELECT authenticate_service(%(service_id)s, %(service_name)s, %(service_secret)s) AS valid; ',
+            'values': {
+                'service_id': service_credentials['service_id'],
+                'service_name': service_credentials['service_name'],
+                'service_secret': service_credentials['service_secret'],
+                }
+        }
+        return self.execute_query(
+            query_data=query_data,
+            return_method='fetchone',
+            cursor_type='RealDictCursor')
+
+    def authenticate_client(self, client_credentials):
+        query_data = {
+            'text': 'SELECT authenticate_client(%(client_id)s, %(username)s, %(secret)s) AS valid; ',
+            'values': {
+                'client_id': client_credentials['client_id'],
+                'username': client_credentials['username'],
+                'secret': client_credentials['secret'],
+                }
+        }
+        return self.execute_query(
+            query_data=query_data,
+            return_method='fetchone',
+            cursor_type='RealDictCursor')
 
     def register_account(self, email: str, password: str):
         query_data = {
@@ -43,7 +73,7 @@ class Aloe(Postgres):
             assert type(results) != errors.UniqueViolation
             return results
         except AssertionError:
-            logger.critical('Failed to create new user')
+            # logging.critical('Failed to create new user')
             return {'id': -1, 'email': None, 'created': None}
 
     def delete_user(self, id: int) -> int:
@@ -53,20 +83,6 @@ class Aloe(Postgres):
             'values': {'id': id}
             }
 
-        return self.execute_query(
-            query_data=query_data,
-            return_method='fetchone',
-            cursor_type='RealDictCursor')
-
-    def authenticate_client(self, client_credentials):
-        query_data = {
-            'text': 'SELECT authenticate_client(%(client_id)s, %(username)s, %(secret)s) AS valid; ',
-            'values': {
-                'client_id': client_credentials['client_id'],
-                'username': client_credentials['username'],
-                'secret': client_credentials['secret'],
-                }
-        }
         return self.execute_query(
             query_data=query_data,
             return_method='fetchone',
