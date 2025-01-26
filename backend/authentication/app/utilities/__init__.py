@@ -1,5 +1,5 @@
-from app.utilities.backend_response import BackendResponse
+from app.utilities.payload_handler import PayloadHandler
 
 __all__ = [
-    'BackendResponse'
+    'PayloadHandler'
 ]

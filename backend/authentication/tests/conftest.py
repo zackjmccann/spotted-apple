@@ -5,6 +5,44 @@ from app import create_app
 
 
 @pytest.fixture()
+def good_client_headers():
+    return {
+        'Client-ID': os.environ['TEST_CLIENT_ID'],
+        'Client-Name': os.environ['TEST_CLIENT_NAME'],
+        'Client-Secret': os.environ['TEST_CLIENT_SECRET'],
+        }
+
+@pytest.fixture()
+def bad_client_headers():
+    return {
+        'Client-ID': 'bad_id',
+        'Client-Name': os.environ['TEST_CLIENT_NAME'],
+        'Client-Secret': os.environ['TEST_CLIENT_SECRET'],
+        }
+
+@pytest.fixture()
+def bad_user():
+    return {
+        'client_id': os.environ['TEST_CLIENT_ID'],
+        'client_name': os.environ['TEST_CLIENT_NAME'],
+        'client_secret': os.environ['TEST_CLIENT_SECRET'],
+        'grant_type': 'authorization',
+        'email': 'bad@user.com',
+        'password': 'badp@55w0rd!',
+        }
+
+@pytest.fixture()
+def good_user():
+    return {
+        'client_id': os.environ['TEST_CLIENT_ID'],
+        'client_name': os.environ['TEST_CLIENT_NAME'],
+        'client_secret': os.environ['TEST_CLIENT_SECRET'],
+        'grant_type': 'authorization',
+        'email': os.environ['TEST_USER_EMAIL'],
+        'password': os.environ['TEST_USER_PASSWORD'],
+        }
+
+@pytest.fixture()
 def good_client_id():
     return os.environ['TEST_CLIENT_ID']
 
