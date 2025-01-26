@@ -5,21 +5,41 @@ from app import create_app
 
 
 @pytest.fixture()
-def good_service_payload():
+def good_client_headers():
     return {
-        'service_id': os.environ['TEST_SERVICE_ID'],
-        'service_name': os.environ['TEST_SERVICE_NAME'],
-        'service_secret': os.environ['TEST_SERVICE_SECRET'],
-        'grant_type': 'client_credentials',
+        'Client-ID': os.environ['TEST_CLIENT_ID'],
+        'Client-Name': os.environ['TEST_CLIENT_NAME'],
+        'Client-Secret': os.environ['TEST_CLIENT_SECRET'],
         }
 
 @pytest.fixture()
-def bad_service_payload():
+def bad_client_headers():
     return {
-        'service_id': 'bad_id',
-        'service_name': os.environ['TEST_SERVICE_NAME'],
-        'service_secret': os.environ['TEST_SERVICE_SECRET'],
-        'grant_type': 'client_credentials',
+        'Client-ID': 'bad_id',
+        'Client-Name': os.environ['TEST_CLIENT_NAME'],
+        'Client-Secret': os.environ['TEST_CLIENT_SECRET'],
+        }
+
+@pytest.fixture()
+def bad_user():
+    return {
+        'client_id': os.environ['TEST_CLIENT_ID'],
+        'client_name': os.environ['TEST_CLIENT_NAME'],
+        'client_secret': os.environ['TEST_CLIENT_SECRET'],
+        'grant_type': 'authorization',
+        'email': 'bad@user.com',
+        'password': 'badp@55w0rd!',
+        }
+
+@pytest.fixture()
+def good_user():
+    return {
+        'client_id': os.environ['TEST_CLIENT_ID'],
+        'client_name': os.environ['TEST_CLIENT_NAME'],
+        'client_secret': os.environ['TEST_CLIENT_SECRET'],
+        'grant_type': 'authorization',
+        'email': os.environ['TEST_USER_EMAIL'],
+        'password': os.environ['TEST_USER_PASSWORD'],
         }
 
 @pytest.fixture()

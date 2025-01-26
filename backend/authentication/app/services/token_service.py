@@ -80,6 +80,40 @@ class TokenService(BaseService):
         
         return tokens
 
+    def issue_user_access_tokens(self, user_data: str) -> str:
+        """
+        Create access and refresh JWTs for a user
+        
+        Tokens issued to users are associated with a registered client. The client ID
+        and name leveraged for audience fields, and the user email is stored within
+        the token context.
+        """
+        try:
+            client_id = user_data['client_id']
+            client_name = user_data['client_name']
+            email = user_data['email']
+        except KeyError:
+            raise TokenError('User data invalid')
+
+        iat = datetime.datetime.now(datetime.timezone.utc)
+        context = { 'id': client_id, 'roles':['user'], 'user': email}
+
+        token_configs = {
+            'access': {
+                'exp': iat + datetime.timedelta(minutes=5),
+                },
+            'refresh': {
+                'exp': iat + datetime.timedelta(minutes=60 * 24 * 7),
+                },
+        }
+
+        tokens = {}
+        for token, config in token_configs.items():
+            tokens.update({
+                token: self.issue_token(client_name, iat, config['exp'], context)})
+
+        return tokens
+
     def validate_token(self, token: str):
         try:
             token_data = self.decode_token(token)

@@ -26,13 +26,13 @@ class Aloe(Postgres):
             return_method='fetchone',
             cursor_type='RealDictCursor')
 
-    def authenticate_client(self, client_credentials):
+    def validate_client(self, client_credentials):
         query_data = {
-            'text': 'SELECT authenticate_client(%(client_id)s, %(username)s, %(secret)s) AS valid; ',
+            'text': 'SELECT validate_client(%(id)s, %(name)s, %(secret)s) AS valid; ',
             'values': {
-                'client_id': client_credentials['client_id'],
-                'username': client_credentials['username'],
-                'secret': client_credentials['secret'],
+                'id': client_credentials['client_id'],
+                'name': client_credentials['client_name'],
+                'secret': client_credentials['client_secret'],
                 }
         }
         return self.execute_query(

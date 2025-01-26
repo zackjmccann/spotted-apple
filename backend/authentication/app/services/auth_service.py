@@ -15,3 +15,10 @@ class AuthenticationService(BaseService):
         if not response['valid']:
             raise AuthenticationError
         return True
+
+    def authenticate_user(self, payload: dict) -> bool:
+        """Authenticate an application user"""
+        response = self.app.db.authenticate_user(payload)
+        if not response['valid']:
+            raise AuthenticationError
+        return True
