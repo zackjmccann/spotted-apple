@@ -17,7 +17,7 @@ class TokenService(BaseService):
         Create a JWT
 
         Note: It is expected the context has an "id" field, which will
-              be concatinated with the ops server ID and used as the JTI
+              be concatenated with the ops server ID and used as the JTI
         """
         try:
             assert self._validate_audience(aud)
@@ -55,13 +55,15 @@ class TokenService(BaseService):
 
     def issue_service_tokens(self, service_data: str) -> str:
         """Create access and refresh JWTs for a service"""
-        name = service_data.get('service_name')
+        try:
+            name = service_data['service_name']
+            id = service_data['service_id']
+        except KeyError:
+            raise TokenError('Service data invalid')
+
         iat = datetime.datetime.now(datetime.timezone.utc)
-        context = {
-            'id': service_data.get('id'),
-            'roles':['service'],
-        }
-        
+        context = { 'id': id, 'roles':['service'], }
+
         token_configs = {
             'access': {
                 'exp': iat + datetime.timedelta(minutes=5),
@@ -88,7 +90,7 @@ class TokenService(BaseService):
 
     def _validate_audience(self, aud: str) -> bool:
         """
-        Validate that the provided aud value for a token is know, and granted
+        Validate that the provided aud value for a token is known and granted
         the abilities to be issued tokens
         """
         return aud in self.granted_aud

@@ -1,5 +1,5 @@
-from app.utilities.payload_handlers import Payload
+from app.utilities.payload_handler import PayloadHandler
 
 __all__ = [
-    'Payload'
+    'PayloadHandler'
 ]

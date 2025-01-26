@@ -5,6 +5,24 @@ from app import create_app
 
 
 @pytest.fixture()
+def good_service_payload():
+    return {
+        'service_id': os.environ['TEST_SERVICE_ID'],
+        'service_name': os.environ['TEST_SERVICE_NAME'],
+        'service_secret': os.environ['TEST_SERVICE_SECRET'],
+        'grant_type': 'client_credentials',
+        }
+
+@pytest.fixture()
+def bad_service_payload():
+    return {
+        'service_id': 'bad_id',
+        'service_name': os.environ['TEST_SERVICE_NAME'],
+        'service_secret': os.environ['TEST_SERVICE_SECRET'],
+        'grant_type': 'client_credentials',
+        }
+
+@pytest.fixture()
 def good_client_id():
     return os.environ['TEST_CLIENT_ID']
 

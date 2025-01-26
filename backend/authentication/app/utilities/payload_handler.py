@@ -3,7 +3,7 @@ import jsonschema
 from datetime import datetime
 from flask import current_app
 
-class Payload:
+class PayloadHandler:
     def __init__(self, data: dict, endpoint: str):
         self.raw_data = data
         self.raw_endpoint = endpoint
@@ -31,7 +31,7 @@ class Payload:
         return self.raw_endpoint.replace('/', '_').strip('_')
 
     def _get_schema(self):
-        schema = models.schemas.get(self.endpoint)
+        schema = models.schemas.get(self.endpoint, None)
         try:
             assert schema
             return schema

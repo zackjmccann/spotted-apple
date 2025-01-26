@@ -1,5 +1,5 @@
 from app.services import BaseService
-from app.services.errors import AuthenticationError
+from services.errors import AuthenticationError
 
 
 class AuthenticationService(BaseService):

@@ -29,6 +29,8 @@ class Middleware:
          data = {'message': 'Authorization failed'}
          res = self.get_response(data=data, status=400)
          return res(environment, start_response)
+      
+      # TODO: Add logic to check token in Authorization Header
         
       return self.wsgi_app(environment, start_response)
 
