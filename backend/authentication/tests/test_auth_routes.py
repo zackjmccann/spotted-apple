@@ -1,4 +1,4 @@
-import pytest
+"""Unit tests for endpoints at the /auth route"""
 
 
 def test_auth_failed_login_missing_client_info(client):

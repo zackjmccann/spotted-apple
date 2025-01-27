@@ -116,10 +116,22 @@ class TokenService(BaseService):
 
     def validate_token(self, token: str):
         try:
+            response = self.app.db.check_token_blacklist(token)
+            assert not response['token_is_blacklisted'] or response['token_is_blacklisted'] is None
             token_data = self.decode_token(token)
             assert token_data
             return True
         except (AssertionError, TokenError):
+            return False
+
+    def revoke_token(self, token: str):
+        """Add a token to the blacklist in Aloe"""
+        try:
+            response = self.app.db.blacklist_token(token)
+            assert response['token'] == token
+            return True
+        except AssertionError:
+            self.app.logger.critical('Failed to blacklist token')
             return False
 
     def _validate_audience(self, aud: str) -> bool:

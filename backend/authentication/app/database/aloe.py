@@ -54,7 +54,7 @@ class Aloe(Postgres):
             assert type(results) != errors.UniqueViolation
             return results
         except AssertionError:
-            logger.critical('Failed to insert new account info')
+            # logger.critical('Failed to insert new account info')
             return {'email': None, 'id': -1, 'created': None}
 
     def create_user(self, id: int, email: str, first_name: str, last_name: str):
@@ -90,7 +90,7 @@ class Aloe(Postgres):
 
     def blacklist_token(self, token):
         query_data = {
-            'text': 'SELECT id FROM blacklist_token(%(token)s);',
+            'text': 'SELECT token FROM blacklist_token(%(token)s);',
             'values': { 'token': token }
         }
         results = self.execute_query(

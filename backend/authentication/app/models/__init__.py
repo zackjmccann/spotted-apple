@@ -1,18 +1,22 @@
 from app.models import (
-    auth_authenticate_service,
+    middleware_client,
     auth_login,
-    middleware_client)
+    token_introspect,
+    token_revoke,
+    )
 
 schemas = {
-    'auth_authenticate_service': auth_authenticate_service.schema,
-    'auth_login': auth_login.schema,
     'middleware_client': middleware_client.schema,
+    'auth_login': auth_login.schema,
+    'token_introspect': token_introspect.schema,
+    'token_revoke': token_revoke.schema,
 }
 
 type_mappings = {
-    'auth_authenticate_service': auth_authenticate_service.type_mappings,
-    'auth_login': auth_login.type_mappings,
     'middleware_client': middleware_client.type_mappings,
+    'auth_login': auth_login.type_mappings,
+    'token_introspect': token_introspect.type_mappings,
+    'token_revoke': token_revoke.type_mappings,
 }
 
 
