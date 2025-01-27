@@ -19,7 +19,7 @@ def introspect():
         return {'valid': False}, 200
 
 @token.route('/revoke', methods=['POST'])
-def revoke():
+def refresh():
     """Revoke JWT token"""
     try:
         payload = PayloadHandler(request.get_json(), request.path)
@@ -29,3 +29,22 @@ def revoke():
 
     except (KeyError, ValidationError, UnsupportedMediaType, AuthenticationError, TokenError):
         return {'revoked': False}, 200
+
+@token.route('/refesh', methods=['POST'])
+def revoke():
+    """
+    Refresh access tokens
+
+    Any valid token can be used to refresh access. The token provided is validated and
+    decoded, issuing new tokens using the client and user data parsed from the provided
+    token. All tokens are blacklisted before new tokens are returned/issued.
+    """
+    try:
+        payload = PayloadHandler(request.get_json(), request.path)
+
+        # TODO: Raise a TokenError if anything goes wrong
+        tokens = current_app.token_service.refresh_access(payload.data.get('token'))
+        return tokens, 200
+
+    except (KeyError, ValidationError, UnsupportedMediaType, AuthenticationError, TokenError):
+        return {'message': 'Failed to refresh access.'}, 400

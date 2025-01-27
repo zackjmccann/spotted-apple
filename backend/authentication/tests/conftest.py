@@ -1,7 +1,6 @@
 import os
-import datetime
 import pytest
-from app.services import TokenService
+import datetime
 from app import create_app
 
 

@@ -3,6 +3,7 @@ from app.models import (
     auth_login,
     token_introspect,
     token_revoke,
+    token_refresh,
     )
 
 schemas = {
@@ -10,6 +11,7 @@ schemas = {
     'auth_login': auth_login.schema,
     'token_introspect': token_introspect.schema,
     'token_revoke': token_revoke.schema,
+    'token_refresh': token_refresh.schema,
 }
 
 type_mappings = {
@@ -17,6 +19,7 @@ type_mappings = {
     'auth_login': auth_login.type_mappings,
     'token_introspect': token_introspect.type_mappings,
     'token_revoke': token_revoke.type_mappings,
+    'token_refresh': token_refresh.type_mappings,
 }
 
 

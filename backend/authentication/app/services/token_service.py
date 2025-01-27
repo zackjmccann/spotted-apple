@@ -121,7 +121,7 @@ class TokenService(BaseService):
             token_data = self.decode_token(token)
             assert token_data
             return True
-        except (AssertionError, TokenError):
+        except(AssertionError, TokenError):
             return False
 
     def revoke_token(self, token: str):
@@ -133,6 +133,24 @@ class TokenService(BaseService):
         except AssertionError:
             self.app.logger.critical('Failed to blacklist token')
             return False
+
+    def refresh_access(self, token: str) -> dict:
+        valid_token = self.validate_token(token)
+        if not valid_token:
+            raise TokenError('Invalid refresh token.')
+
+        token_data = self.decode_token(token)
+        context = token_data.get('context')
+
+        user_access_data = {
+            'client_id': context.get('id'),
+            'client_name': token_data.get('aud')[0],
+            'email': context.get('user'),
+        }
+
+        tokens = self.issue_user_access_tokens(user_access_data)
+        self.revoke_token(token)
+        return tokens
 
     def _validate_audience(self, aud: str) -> bool:
         """
