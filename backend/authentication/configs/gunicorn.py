@@ -8,7 +8,6 @@ workers = int(os.getenv('WEB_CONCURRENCY', multiprocessing.cpu_count() * 2))
 threads = int(os.getenv('PYTHON_MAX_THREADS', 1))
 timeout = int(os.getenv('WEB_TIMEOUT', 120))
 
-
 def process_json_template(value):
     if isinstance(value, str) and value.startswith("${") and value.endswith("}"):
         env_var = value[2:-1]

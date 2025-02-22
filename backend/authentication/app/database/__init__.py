@@ -1,7 +1,4 @@
-from app.database.aloe import Aloe
+from app.database.aloe import AloeError, init_app
 
-aloe = Aloe()
 
-__all__ = [
-    'aloe',
-]
+__all__ = ['AloeError', 'init_app']

@@ -1,14 +1,35 @@
 """
 A class representing an instance of the Spotted Apple Database "Aloe"
 """
-from auth_logging import logger
 from app.database.postgres import Postgres
 from psycopg2 import errors
+
+def init_app(app):
+    app.logger.debug('Initializing database...')
+    app.db = Aloe()
+
+
+class AloeError(Exception):
+    pass
 
 
 class Aloe(Postgres):
     def __init__(self):
         super().__init__()
+
+    def validate_client(self, client_credentials):
+        query_data = {
+            'text': 'SELECT validate_client(%(id)s, %(name)s, %(secret)s) AS valid; ',
+            'values': {
+                'id': client_credentials['client_id'],
+                'name': client_credentials['client_name'],
+                'secret': client_credentials['client_secret'],
+                }
+        }
+        return self.execute_query(
+            query_data=query_data,
+            return_method='fetchone',
+            cursor_type='RealDictCursor')
 
     def register_account(self, email: str, password: str):
         query_data = {
@@ -24,7 +45,7 @@ class Aloe(Postgres):
             assert type(results) != errors.UniqueViolation
             return results
         except AssertionError:
-            logger.critical('Failed to insert new account info')
+            # logger.critical('Failed to insert new account info')
             return {'email': None, 'id': -1, 'created': None}
 
     def create_user(self, id: int, email: str, first_name: str, last_name: str):
@@ -43,7 +64,7 @@ class Aloe(Postgres):
             assert type(results) != errors.UniqueViolation
             return results
         except AssertionError:
-            logger.critical('Failed to create new user')
+            # logging.critical('Failed to create new user')
             return {'id': -1, 'email': None, 'created': None}
 
     def delete_user(self, id: int) -> int:
@@ -58,23 +79,9 @@ class Aloe(Postgres):
             return_method='fetchone',
             cursor_type='RealDictCursor')
 
-    def authenticate_client(self, client_credentials):
-        query_data = {
-            'text': 'SELECT authenticate_client(%(client_id)s, %(username)s, %(secret)s) AS valid; ',
-            'values': {
-                'client_id': client_credentials['client_id'],
-                'username': client_credentials['username'],
-                'secret': client_credentials['secret'],
-                }
-        }
-        return self.execute_query(
-            query_data=query_data,
-            return_method='fetchone',
-            cursor_type='RealDictCursor')
-
     def blacklist_token(self, token):
         query_data = {
-            'text': 'SELECT id FROM blacklist_token(%(token)s);',
+            'text': 'SELECT token FROM blacklist_token(%(token)s);',
             'values': { 'token': token }
         }
         results = self.execute_query(
@@ -86,7 +93,7 @@ class Aloe(Postgres):
             assert type(results) != errors.UniqueViolation
             return results
         except AssertionError:
-            raise KeyError('Failed to blacklist token')
+            raise AloeError('Failed to blacklist token')
 
     def check_token_blacklist(self, token):
         query_data = {

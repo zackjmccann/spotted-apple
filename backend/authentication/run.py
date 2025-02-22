@@ -1,10 +1,9 @@
 import os
 from app import create_app
-from distutils.util import strtobool
 
+env = os.getenv('FLASK_ENV', 'development')
 
-app = create_app()
+app = create_app(env=env)
 
 if __name__ == "__main__":
-    debug = bool(strtobool(os.getenv('FLASK_DEBUG', 'false')))
-    app.run(debug=debug)
+    app.run()
