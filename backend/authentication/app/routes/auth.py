@@ -14,12 +14,13 @@ def login():
     Authenticate an application user.
 
     Expected payload delivered to this endpoint much present the following:
-        Client ID     : The ID of the client facilitating the authentication
-        Client Name   : The name of the client facilitating the authentication
-        Client Secret : A secret key associated with the client
         Grant Type    : Only "authorization" is accepted
         Email         : The email attempting to authenticate
         Password      : The password associated with the provided username
+
+    A client ID and name are required to create access tokens. These are parsed
+    from the request headers, which are validated by the Midddleware, so they
+    should always be present.
     """
     try:
         payload = PayloadHandler(request.get_json(), request.path)
@@ -27,7 +28,12 @@ def login():
         authenticated = current_app.auth_service.authenticate_user(payload.data)
 
         if authenticated:
-            tokens = current_app.token_service.issue_user_access_tokens(payload.data)
+            user_data = payload.data
+            user_data.update({
+                'client_id': request.headers.get('Client-ID'),
+                'client_name': request.headers.get('Client-Name'),
+            })
+            tokens = current_app.token_service.issue_user_access_tokens(user_data)
             return tokens, 200
 
     except (KeyError, ValidationError, UnsupportedMediaType, AuthenticationError, TokenError):

@@ -12,13 +12,15 @@ TODO:
 import json
 import logging
 from flask import current_app
+from jsonschema import ValidationError
 from utilities.payload_handler import PayloadHandler
 from werkzeug.wrappers import Request, Response
 
 
 class Middleware:
-   def __init__(self, wsgi_app):
-      self.wsgi_app = wsgi_app
+   def __init__(self, app):
+      self.app = app
+      self.wsgi_app = app.wsgi_app
       self.logger = logging.getLogger(__name__)
    
    def __call__(self, environment, start_response):
@@ -50,10 +52,14 @@ class Middleware:
          'client_secret': headers.get('Client-Secret'),
          }
 
-      payload = PayloadHandler(client, '/middleware/client')
-      
-      response = current_app.db.validate_client(payload.data)
-      
-      if not response['valid']:
+      try:
+         payload = PayloadHandler(client, '/middleware/client') 
+         with self.app.app_context():
+            response = current_app.db.validate_client(payload.data)
+         
+         if not response['valid']:
+            return False
+         return True
+
+      except ValidationError:
          return False
-      return True

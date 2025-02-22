@@ -65,16 +65,17 @@ def good_token_data():
             }
     }
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='session')
 def app():
     app = create_app()
     app.config.update({ "TESTING": True, })
 
     yield app
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='session')
 def client(app):
-    return app.test_client()
+    with app.test_request_context():
+        return app.test_client()
 
 @pytest.fixture(scope='module')
 def token_service(app):

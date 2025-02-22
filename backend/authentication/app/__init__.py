@@ -22,7 +22,7 @@ def register_blueprints(app: Flask):
         }
     
     for blueprint in blueprints:    
-        # CORS(blueprint['blueprint'], resources=blueprint.get('cors_config', DEFAULT_CORS_CONFIG))
+        CORS(blueprint['blueprint'], resources=blueprint.get('cors_config', DEFAULT_CORS_CONFIG))
         app.register_blueprint(blueprint['blueprint'], url_prefix=blueprint['url_prefix'])
 
 def create_app(config: str = 'configs.settings', env: str = 'development'):
@@ -31,8 +31,8 @@ def create_app(config: str = 'configs.settings', env: str = 'development'):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(config)
     app.config.from_pyfile(f'{env}.py', silent=True)
-
-    app.wsgi_app = Middleware(app.wsgi_app)
+    
+    app.wsgi_app = Middleware(app)
 
     register_extensions(app)
     register_blueprints(app)
