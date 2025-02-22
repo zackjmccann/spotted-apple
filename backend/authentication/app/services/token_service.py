@@ -1,5 +1,6 @@
 import jwt
 import datetime
+from database import AloeError
 from app.services.base_service import BaseService
 from app.services.errors import TokenError
 
@@ -17,11 +18,11 @@ class TokenService(BaseService):
         Create a JWT
 
         Note: It is expected the context has an "id" field, which will
-              be concatenated with the ops server ID and used as the JTI
+              be concatenated with the application ID and used as the JTI
         """
         try:
             assert self._validate_audience(aud)
-            jti = f'{self.id}-{context["id"]}'
+            jti = f'{self.id}-{context["id"]}-{str(iat.timestamp())}'
             data = {
                 'iss': 'spotted-apple-auth-service',
                 'aud': [aud],
@@ -117,6 +118,7 @@ class TokenService(BaseService):
     def validate_token(self, token: str):
         try:
             response = self.app.db.check_token_blacklist(token)
+            self.app.logger.debug(f'Response: {response["token_is_blacklisted"]}')
             assert not response['token_is_blacklisted'] or response['token_is_blacklisted'] is None
             token_data = self.decode_token(token)
             assert token_data
@@ -130,6 +132,11 @@ class TokenService(BaseService):
             response = self.app.db.blacklist_token(token)
             assert response['token'] == token
             return True
+
+        except AloeError:
+            self.app.logger.warning('Token already in blacklist.')
+            return True
+
         except AssertionError:
             self.app.logger.critical('Failed to blacklist token')
             return False

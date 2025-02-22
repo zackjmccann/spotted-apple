@@ -51,6 +51,7 @@ def test_token_revoke(client, good_client_headers, tokens):
     The request should not experience errors, it should successfully handle and process
     the request, but simply responsed with the appropriate "invalid" response.
     """
+    print(tokens)
     payload = {'token': tokens.get('access')}
     response = client.post('/token/revoke', headers=good_client_headers, json=payload)
     data = response.get_json()
@@ -64,3 +65,14 @@ def test_token_revoke(client, good_client_headers, tokens):
 
     assert response.status_code == 200
     assert data.get('revoked')
+
+def test_token_refresh(client, good_client_headers, refresh_token):
+    """Refresh user access"""
+    print(f'Test Refresh: {refresh_token}')
+    payload = {'token': refresh_token}
+    response = client.post('/token/refresh', headers=good_client_headers, json=payload)
+    data = response.get_json()
+
+    assert response.status_code == 200
+    assert data.get('access')
+    assert data.get('refresh')

@@ -8,6 +8,11 @@ def init_app(app):
     app.logger.debug('Initializing database...')
     app.db = Aloe()
 
+
+class AloeError(Exception):
+    pass
+
+
 class Aloe(Postgres):
     def __init__(self):
         super().__init__()
@@ -102,7 +107,7 @@ class Aloe(Postgres):
             assert type(results) != errors.UniqueViolation
             return results
         except AssertionError:
-            raise KeyError('Failed to blacklist token')
+            raise AloeError('Failed to blacklist token')
 
     def check_token_blacklist(self, token):
         query_data = {

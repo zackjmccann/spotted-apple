@@ -4,7 +4,7 @@ import datetime
 from app import create_app
 
 
-@pytest.fixture()
+@pytest.fixture(scope='module')
 def good_client_headers():
     return {
         'Client-ID': os.environ['TEST_CLIENT_ID'],
@@ -12,7 +12,7 @@ def good_client_headers():
         'Client-Secret': os.environ['TEST_CLIENT_SECRET'],
         }
 
-@pytest.fixture()
+@pytest.fixture(scope='module')
 def bad_client_headers():
     return {
         'Client-ID': 'bad_id',
@@ -53,8 +53,8 @@ def bad_token_data():
 
 @pytest.fixture()
 def good_token_data():
-    iat = datetime.datetime.now(datetime.timezone.utc).timestamp()
-    exp = (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=5)).timestamp()
+    iat = datetime.datetime.now(datetime.timezone.utc)
+    exp = (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=5))
     return {
         'aud': os.environ['TEST_CLIENT_NAME'],
         'iat': iat,
@@ -64,7 +64,6 @@ def good_token_data():
             'roles':['test']
             }
     }
-
 
 @pytest.fixture(scope='module')
 def app():
@@ -106,3 +105,29 @@ def tokens(app, good_user):
             if valid:
                 revoked = app.token_service.revoke_token(token)
                 assert revoked
+
+@pytest.fixture(scope='module')
+def good_refresh_user():
+    return {
+        'client_id': os.environ['TEST_CLIENT_ID'],
+        'client_name': os.environ['TEST_CLIENT_NAME'],
+        'client_secret': os.environ['TEST_CLIENT_SECRET'],
+        'grant_type': 'authorization',
+        'email': os.environ['TEST_USER_EMAIL'],
+        'password': os.environ['TEST_USER_PASSWORD'],
+        }
+
+@pytest.fixture(scope='module')
+def refresh_token(app, good_refresh_user):
+    """
+    Create a refresh tokens for unit testing.
+
+    This token is specifically to test the /token/refresh route, which revokes the token
+    it receives. Therefore, only the access token is revoked explictly here, and there is
+    no tear down code.
+    """
+    with app.app_context():
+        tokens = app.token_service.issue_user_access_tokens(good_refresh_user)
+        revoked = app.token_service.revoke_token(tokens.get('access'))
+        assert revoked
+        yield tokens.get('refresh')

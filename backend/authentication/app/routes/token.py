@@ -2,7 +2,7 @@ from jsonschema import ValidationError
 from flask import current_app, request, Blueprint
 from werkzeug.exceptions import UnsupportedMediaType
 from utilities.payload_handler import PayloadHandler
-from services.errors import AuthenticationError, TokenError
+from app.services.errors import AuthenticationError, TokenError
 
 token = Blueprint('token', __name__)
 
@@ -19,7 +19,7 @@ def introspect():
         return {'valid': False}, 200
 
 @token.route('/revoke', methods=['POST'])
-def refresh():
+def revoke():
     """Revoke JWT token"""
     try:
         payload = PayloadHandler(request.get_json(), request.path)
@@ -30,8 +30,8 @@ def refresh():
     except (KeyError, ValidationError, UnsupportedMediaType, AuthenticationError, TokenError):
         return {'revoked': False}, 200
 
-@token.route('/refesh', methods=['POST'])
-def revoke():
+@token.route('/refresh', methods=['POST'])
+def refresh():
     """
     Refresh access tokens
 
@@ -42,7 +42,6 @@ def revoke():
     try:
         payload = PayloadHandler(request.get_json(), request.path)
 
-        # TODO: Raise a TokenError if anything goes wrong
         tokens = current_app.token_service.refresh_access(payload.data.get('token'))
         return tokens, 200
 
