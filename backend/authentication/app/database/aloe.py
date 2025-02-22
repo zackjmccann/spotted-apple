@@ -17,10 +17,6 @@ class Aloe(Postgres):
     def __init__(self):
         super().__init__()
 
-    def authenticate_service(self, service_credentials):
-        """TODO: Drop authenticate_service procedure from DB"""
-        pass
-
     def validate_client(self, client_credentials):
         query_data = {
             'text': 'SELECT validate_client(%(id)s, %(name)s, %(secret)s) AS valid; ',
