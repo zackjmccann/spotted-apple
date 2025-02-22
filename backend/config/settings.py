@@ -1,7 +1,11 @@
 import os
-from distutils.util import strtobool
 
-
-FLASK_DEBUG = bool(strtobool(os.getenv('FLASK_DEBUG', 'false')))
 SECRET_KEY = os.getenv('SECRET_KEY')
 SERVER_NAME = os.getenv('SERVER_NAME')
+
+DEBUG_MODE = os.getenv('DEBUG_MODE', 'false')
+
+if DEBUG_MODE.lower() == 'true':
+    FLASK_DEBUG = True
+else:
+    FLASK_DEBUG = False

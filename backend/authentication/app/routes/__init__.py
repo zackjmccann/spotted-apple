@@ -1,9 +1,9 @@
 from app.routes.auth import auth
-from app.routes.register import register
+from app.routes.token import token
 
 blueprints = [
     {'blueprint': auth, 'url_prefix': '/auth'},
-    {'blueprint': register, 'url_prefix': '/register'},
+    {'blueprint': token, 'url_prefix': '/token'},
 ]
 
 __all__ = [
