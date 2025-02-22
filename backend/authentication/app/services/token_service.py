@@ -54,33 +54,6 @@ class TokenService(BaseService):
         except jwt.InvalidTokenError:
             raise TokenError('Token Invalid')
 
-    def issue_service_tokens(self, service_data: str) -> str:
-        """Create access and refresh JWTs for a service"""
-        try:
-            name = service_data['service_name']
-            id = service_data['service_id']
-        except KeyError:
-            raise TokenError('Service data invalid')
-
-        iat = datetime.datetime.now(datetime.timezone.utc)
-        context = { 'id': id, 'roles':['service'], }
-
-        token_configs = {
-            'access': {
-                'exp': iat + datetime.timedelta(minutes=5),
-                },
-            'refresh': {
-                'exp': iat + datetime.timedelta(minutes=60 * 24 * 7),
-                },
-        }
-
-        tokens = {}
-        for token, config in token_configs.items():
-            tokens.update({
-                token: self.issue_token(name, iat, config['exp'], context)})
-        
-        return tokens
-
     def issue_user_access_tokens(self, user_data: str) -> str:
         """
         Create access and refresh JWTs for a user

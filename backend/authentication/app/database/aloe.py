@@ -18,18 +18,8 @@ class Aloe(Postgres):
         super().__init__()
 
     def authenticate_service(self, service_credentials):
-        query_data = {
-            'text': 'SELECT authenticate_service(%(service_id)s, %(service_name)s, %(service_secret)s) AS valid; ',
-            'values': {
-                'service_id': service_credentials['service_id'],
-                'service_name': service_credentials['service_name'],
-                'service_secret': service_credentials['service_secret'],
-                }
-        }
-        return self.execute_query(
-            query_data=query_data,
-            return_method='fetchone',
-            cursor_type='RealDictCursor')
+        """TODO: Drop authenticate_service procedure from DB"""
+        pass
 
     def validate_client(self, client_credentials):
         query_data = {
