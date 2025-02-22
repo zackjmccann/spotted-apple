@@ -23,9 +23,6 @@ def bad_client_headers():
 @pytest.fixture(scope='module')
 def bad_user():
     return {
-        'client_id': os.environ['TEST_CLIENT_ID'],
-        'client_name': os.environ['TEST_CLIENT_NAME'],
-        'client_secret': os.environ['TEST_CLIENT_SECRET'],
         'grant_type': 'authorization',
         'email': 'bad@user.com',
         'password': 'badp@55w0rd!',
@@ -34,9 +31,6 @@ def bad_user():
 @pytest.fixture(scope='module')
 def good_user():
     return {
-        'client_id': os.environ['TEST_CLIENT_ID'],
-        'client_name': os.environ['TEST_CLIENT_NAME'],
-        'client_secret': os.environ['TEST_CLIENT_SECRET'],
         'grant_type': 'authorization',
         'email': os.environ['TEST_USER_EMAIL'],
         'password': os.environ['TEST_USER_PASSWORD'],
@@ -89,7 +83,7 @@ def token_service(app):
         yield app.token_service
 
 @pytest.fixture(scope='module')
-def tokens(app, good_user):
+def tokens(app, good_client_headers, good_user):
     """
     Tokens issues by unit test /token routes.
 
@@ -97,7 +91,11 @@ def tokens(app, good_user):
     If tokens are still valid, they are revoked here.
     """
     with app.app_context():
-        tokens = app.token_service.issue_user_access_tokens(good_user)
+        good_user_data = good_user | {
+            'client_id': good_client_headers['Client-ID'],
+            'client_name': good_client_headers['Client-Name'],
+        }
+        tokens = app.token_service.issue_user_access_tokens(good_user_data)
         yield tokens
 
         for token in tokens.values():
@@ -110,16 +108,13 @@ def tokens(app, good_user):
 @pytest.fixture(scope='module')
 def good_refresh_user():
     return {
-        'client_id': os.environ['TEST_CLIENT_ID'],
-        'client_name': os.environ['TEST_CLIENT_NAME'],
-        'client_secret': os.environ['TEST_CLIENT_SECRET'],
         'grant_type': 'authorization',
         'email': os.environ['TEST_USER_EMAIL'],
         'password': os.environ['TEST_USER_PASSWORD'],
         }
 
 @pytest.fixture(scope='module')
-def refresh_token(app, good_refresh_user):
+def refresh_token(app, good_client_headers, good_refresh_user):
     """
     Create a refresh tokens for unit testing.
 
@@ -128,7 +123,11 @@ def refresh_token(app, good_refresh_user):
     no tear down code.
     """
     with app.app_context():
-        tokens = app.token_service.issue_user_access_tokens(good_refresh_user)
+        good_user_data = good_refresh_user | {
+            'client_id': good_client_headers['Client-ID'],
+            'client_name': good_client_headers['Client-Name'],
+        }
+        tokens = app.token_service.issue_user_access_tokens(good_user_data)
         revoked = app.token_service.revoke_token(tokens.get('access'))
         assert revoked
         yield tokens.get('refresh')
